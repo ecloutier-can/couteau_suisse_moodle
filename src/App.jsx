@@ -79,8 +79,7 @@ const Navbar = ({ searchTerm, setSearchTerm }) => (
     </div>
 
     <div className="flex items-center gap-4">
-      <button className="text-sm font-semibold text-gray-400 hover:text-white transition-colors px-4">Log in</button>
-      <button className="bg-app-accent text-white px-6 py-2.5 rounded-full text-xs font-extrabold uppercase tracking-widest hover:bg-app-active transition-colors shadow-lg shadow-app-accent/20">Sign up</button>
+      {/* Login/Signup removed */}
     </div>
   </nav>
 );
@@ -196,9 +195,7 @@ export default function App() {
 
         <footer className="px-16 py-10 border-t border-white/5 flex justify-between items-center text-[10px] text-gray-600 font-bold uppercase tracking-widest">
           <div className="flex gap-8">
-            <span>About Us</span>
-            <span>Documentation</span>
-            <span>Support</span>
+            {/* Pied de page simplifié */}
           </div>
           <div className="flex gap-6 opacity-30">
             <span>X</span>
