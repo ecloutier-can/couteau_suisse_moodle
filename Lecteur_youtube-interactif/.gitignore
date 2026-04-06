@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/
+
+# Build
+dist/
+dist-ssr/
+*.local
+
+# Editor/OS
+.vscode/
+.idea/
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Requested exclusion
+guide_youtube_*.pdf
+
+# App-specific ignores
+node_modules/
+dist/
+assets/
+dist-ssr/
