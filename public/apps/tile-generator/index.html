@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generateur de Tuiles Moodle</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        body {
+            background: #1a1a2e;
+            color: #eee;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: #fff;
+            margin-bottom: 30px;
+        }
+        .main-layout {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        .form-section {
+            flex: 1;
+            min-width: 300px;
+        }
+        .preview-section {
+            flex: 1;
+            min-width: 320px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #ccc;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #444;
+            border-radius: 5px;
+            background: #2a2a4a;
+            color: #fff;
+            font-size: 14px;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        .type-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .type-btn {
+            flex: 1;
+            min-width: 80px;
+            padding: 12px 15px;
+            border: 2px solid #444;
+            border-radius: 8px;
+            background: #2a2a4a;
+            color: #fff;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        .type-btn:hover {
+            border-color: #667eea;
+        }
+        .type-btn.active {
+            border-color: #667eea;
+            background: #3a3a6a;
+        }
+        .type-btn.semaine.active { border-color: #2980b9; background: #2980b9; }
+        .type-btn.test.active { border-color: #c0392b; background: #c0392b; }
+        .type-btn.pratique.active { border-color: #e67e22; background: #e67e22; }
+        .type-btn.examen.active { border-color: #8e44ad; background: #8e44ad; }
+        .type-btn.relache.active { border-color: #27ae60; background: #27ae60; }
+
+        .preview-box {
+            background: #2a2a4a;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+        }
+        canvas {
+            border-radius: 5px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        .btn-download {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .btn-download:hover {
+            transform: scale(1.05);
+        }
+        .color-preview {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .angle-slider {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .angle-slider input[type="range"] {
+            flex: 1;
+        }
+        .angle-value {
+            min-width: 40px;
+            text-align: center;
+        }
+
+        .tiles-list {
+            margin-top: 30px;
+            background: #2a2a4a;
+            border-radius: 10px;
+            padding: 20px;
+        }
+        .tiles-list h3 {
+            margin-top: 0;
+            color: #fff;
+        }
+        .tile-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 10px;
+            background: #1a1a2e;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        .tile-item canvas {
+            width: 150px;
+            height: 100px;
+        }
+        .tile-info {
+            flex: 1;
+        }
+        .tile-actions button {
+            padding: 8px 15px;
+            margin: 2px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .btn-dl { background: #27ae60; color: #fff; }
+        .btn-del { background: #c0392b; color: #fff; }
+        .btn-add {
+            width: 100%;
+            padding: 15px;
+            background: #3a3a6a;
+            border: 2px dashed #667eea;
+            border-radius: 8px;
+            color: #667eea;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-add:hover {
+            background: #4a4a7a;
+        }
+        .btn-download-all {
+            width: 100%;
+            margin-top: 15px;
+            padding: 15px;
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .info-text {
+            font-size: 12px;
+            color: #888;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Generateur de Tuiles Moodle</h1>
+
+        <div class="main-layout">
+            <div class="form-section">
+                <div class="form-group">
+                    <label>Type de section</label>
+                    <div class="type-buttons">
+                        <div class="type-btn semaine active" data-type="semaine">Semaine</div>
+                        <div class="type-btn test" data-type="test">Test</div>
+                        <div class="type-btn pratique" data-type="pratique">Pratique</div>
+                        <div class="type-btn examen" data-type="examen">Examen</div>
+                        <div class="type-btn relache" data-type="relache">Relache</div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="title">Titre (haut gauche)</label>
+                    <input type="text" id="title" placeholder="Ex: Semaine 1, Test #2 - 10%">
+                </div>
+
+                <div class="form-group">
+                    <label for="subject">Sujet (centre) - utiliser Entree pour nouvelle ligne</label>
+                    <textarea id="subject" placeholder="Ex: Les antipsychotiques&#10;et anticonvulsivants"></textarea>
+                    <div class="info-text">Laissez vide pour n'afficher que le titre</div>
+                </div>
+
+                <div class="form-group">
+                    <label>Angle du degrade</label>
+                    <div class="angle-slider">
+                        <input type="range" id="angle" min="0" max="180" value="45">
+                        <span class="angle-value" id="angleValue">45°</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Couleurs personnalisees (optionnel)</label>
+                    <div class="color-preview">
+                        <input type="color" id="color1" value="#2980b9">
+                        <span>→</span>
+                        <input type="color" id="color2" value="#8e44ad">
+                        <label style="display: inline; margin-left: 10px;">
+                            <input type="checkbox" id="useCustomColors"> Utiliser
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="preview-section">
+                <div class="preview-box">
+                    <canvas id="preview" width="300" height="200"></canvas>
+                    <br>
+                    <button class="btn-download" onclick="downloadCurrent()">Telecharger cette image</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="tiles-list">
+            <h3>Liste des tuiles</h3>
+            <div id="tilesList"></div>
+            <button class="btn-add" onclick="addToList()">+ Ajouter a la liste</button>
+            <button class="btn-download-all" onclick="downloadAll()">Telecharger toutes les images (.zip)</button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script>
+        const canvas = document.getElementById('preview');
+        const ctx = canvas.getContext('2d');
+
+        const WIDTH = 300;
+        const HEIGHT = 200;
+        const MARGIN_SIDE = 20;
+        const TOP_ZONE = 50;      // 25% haut pour le titre
+        const BOTTOM_ZONE = 50;   // 25% bas pour progress bar Moodle
+        const CENTER_ZONE = 100;  // 50% centre pour le sujet
+
+        let currentType = 'semaine';
+        let tilesList = [];
+
+        const colorSchemes = {
+            semaine: [
+                ['#2980b9', '#8e44ad'],
+                ['#2ecc71', '#27ae60'],
+                ['#3498db', '#2980b9'],
+                ['#9b59b6', '#8e44ad'],
+                ['#1abc9c', '#16a085'],
+                ['#34495e', '#2c3e50'],
+                ['#2980b9', '#27ae60'],
+                ['#8e44ad', '#c0392b'],
+                ['#16a085', '#2980b9'],
+                ['#27ae60', '#8e44ad'],
+            ],
+            test: [['#e74c3c', '#c0392b']],
+            pratique: [['#f39c12', '#e67e22']],
+            examen: [['#c0392b', '#8e44ad']],
+            relache: [['#2ecc71', '#1abc9c']]
+        };
+
+        let colorIndex = 0;
+
+        // Event listeners
+        document.querySelectorAll('.type-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentType = btn.dataset.type;
+                updatePreview();
+            });
+        });
+
+        document.getElementById('title').addEventListener('input', updatePreview);
+        document.getElementById('subject').addEventListener('input', updatePreview);
+        document.getElementById('angle').addEventListener('input', (e) => {
+            document.getElementById('angleValue').textContent = e.target.value + '°';
+            updatePreview();
+        });
+        document.getElementById('color1').addEventListener('input', updatePreview);
+        document.getElementById('color2').addEventListener('input', updatePreview);
+        document.getElementById('useCustomColors').addEventListener('change', updatePreview);
+
+        function hexToRgb(hex) {
+            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? {
+                r: parseInt(result[1], 16),
+                g: parseInt(result[2], 16),
+                b: parseInt(result[3], 16)
+            } : null;
+        }
+
+        function drawGradient(ctx, width, height, color1, color2, angle) {
+            const angleRad = angle * Math.PI / 180;
+            const cos = Math.cos(angleRad);
+            const sin = Math.sin(angleRad);
+
+            const c1 = hexToRgb(color1);
+            const c2 = hexToRgb(color2);
+
+            const imageData = ctx.createImageData(width, height);
+            const data = imageData.data;
+            const maxDist = Math.abs(width * cos) + Math.abs(height * sin);
+
+            for (let y = 0; y < height; y++) {
+                for (let x = 0; x < width; x++) {
+                    let dist = (x * cos + y * sin) / maxDist;
+                    dist = Math.max(0, Math.min(1, dist));
+
+                    const idx = (y * width + x) * 4;
+                    data[idx] = Math.round(c1.r + (c2.r - c1.r) * dist);
+                    data[idx + 1] = Math.round(c1.g + (c2.g - c1.g) * dist);
+                    data[idx + 2] = Math.round(c1.b + (c2.b - c1.b) * dist);
+                    data[idx + 3] = 255;
+                }
+            }
+            ctx.putImageData(imageData, 0, 0);
+        }
+
+        function drawDiagonalLines(ctx, width, height, spacing = 25, opacity = 0.06) {
+            ctx.strokeStyle = `rgba(255, 255, 255, ${opacity})`;
+            ctx.lineWidth = 2;
+
+            for (let i = -height; i < width + height; i += spacing) {
+                ctx.beginPath();
+                ctx.moveTo(i, 0);
+                ctx.lineTo(i + height, height);
+                ctx.stroke();
+            }
+        }
+
+        // Fonction pour mesurer et adapter le texte
+        function fitText(ctx, text, maxWidth, maxFontSize, minFontSize) {
+            let fontSize = maxFontSize;
+            ctx.font = `bold ${fontSize}px Arial`;
+
+            while (ctx.measureText(text).width > maxWidth && fontSize > minFontSize) {
+                fontSize -= 1;
+                ctx.font = `bold ${fontSize}px Arial`;
+            }
+
+            return fontSize;
+        }
+
+        // Fonction pour wrapper le texte sur plusieurs lignes
+        function wrapText(ctx, text, maxWidth, fontSize) {
+            const words = text.split(' ');
+            const lines = [];
+            let currentLine = '';
+
+            ctx.font = `bold ${fontSize}px Arial`;
+
+            for (const word of words) {
+                const testLine = currentLine ? currentLine + ' ' + word : word;
+                if (ctx.measureText(testLine).width > maxWidth && currentLine) {
+                    lines.push(currentLine);
+                    currentLine = word;
+                } else {
+                    currentLine = testLine;
+                }
+            }
+            if (currentLine) {
+                lines.push(currentLine);
+            }
+
+            return lines;
+        }
+
+        function drawText(ctx, title, subject, width, height) {
+            const maxTextWidth = width - (MARGIN_SIDE * 2);
+
+            // === TITRE (zone 25% haut) ===
+            let titleFontSize = 20;
+            let titleLines = [title];
+
+            ctx.font = `bold ${titleFontSize}px Arial`;
+            let titleWidth = ctx.measureText(title).width;
+
+            if (titleWidth > maxTextWidth) {
+                // Reduire la taille
+                titleFontSize = fitText(ctx, title, maxTextWidth, 20, 12);
+                ctx.font = `bold ${titleFontSize}px Arial`;
+                titleWidth = ctx.measureText(title).width;
+
+                // Si encore trop long, wrapper
+                if (titleWidth > maxTextWidth) {
+                    titleLines = wrapText(ctx, title, maxTextWidth, titleFontSize);
+                }
+            }
+
+            // Centrer verticalement dans la zone du haut (0 - TOP_ZONE)
+            const titleLineHeight = titleFontSize * 1.2;
+            const titleTotalHeight = titleLines.length * titleLineHeight;
+            let titleStartY = (TOP_ZONE - titleTotalHeight) / 2 + titleFontSize;
+
+            titleLines.forEach((line, i) => {
+                const y = titleStartY + (i * titleLineHeight);
+                ctx.font = `bold ${titleFontSize}px Arial`;
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+                ctx.fillText(line, MARGIN_SIDE + 2, y + 2);
+                ctx.fillStyle = '#ffffff';
+                ctx.fillText(line, MARGIN_SIDE, y);
+            });
+
+            // === SUJET (zone 50% centre) ===
+            if (subject) {
+                let subjectLines = subject.split('\n');
+                let subjectFontSize = 28;
+                let allLines = [];
+                let needsResize = true;
+
+                // Boucle pour adapter la taille et wrapper
+                while (needsResize && subjectFontSize >= 12) {
+                    allLines = [];
+                    ctx.font = `bold ${subjectFontSize}px Arial`;
+
+                    for (const line of subjectLines) {
+                        const lineWidth = ctx.measureText(line).width;
+                        if (lineWidth > maxTextWidth) {
+                            // Verifier si c'est un seul mot
+                            if (line.indexOf(' ') === -1) {
+                                // Mot seul trop long - reduire la taille
+                                let wordFontSize = subjectFontSize;
+                                while (ctx.measureText(line).width > maxTextWidth && wordFontSize > 12) {
+                                    wordFontSize -= 2;
+                                    ctx.font = `bold ${wordFontSize}px Arial`;
+                                }
+                                if (wordFontSize < subjectFontSize) {
+                                    subjectFontSize = wordFontSize;
+                                    ctx.font = `bold ${subjectFontSize}px Arial`;
+                                }
+                                allLines.push(line);
+                            } else {
+                                allLines.push(...wrapText(ctx, line, maxTextWidth, subjectFontSize));
+                            }
+                        } else {
+                            allLines.push(line);
+                        }
+                    }
+
+                    const totalTextHeight = allLines.length * (subjectFontSize * 1.3);
+                    if (totalTextHeight <= CENTER_ZONE) {
+                        needsResize = false;
+                    } else {
+                        subjectFontSize -= 2;
+                    }
+                }
+
+                // Dessiner le sujet centre dans la zone du milieu
+                const lineHeight = subjectFontSize * 1.3;
+                const totalTextHeight = allLines.length * lineHeight;
+                const centerZoneStart = TOP_ZONE;
+                const startY = centerZoneStart + (CENTER_ZONE - totalTextHeight) / 2 + subjectFontSize;
+
+                ctx.font = `bold ${subjectFontSize}px Arial`;
+
+                allLines.forEach((line, i) => {
+                    const textWidth = ctx.measureText(line).width;
+                    const x = (width - textWidth) / 2;
+                    const y = startY + i * lineHeight;
+
+                    ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+                    ctx.fillText(line, x + 2, y + 2);
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillText(line, x, y);
+                });
+            }
+        }
+
+        function getColors() {
+            if (document.getElementById('useCustomColors').checked) {
+                return [
+                    document.getElementById('color1').value,
+                    document.getElementById('color2').value
+                ];
+            }
+            const schemes = colorSchemes[currentType];
+            return schemes[colorIndex % schemes.length];
+        }
+
+        function drawTile(ctx, title, subject, type, angle, colors = null) {
+            const [color1, color2] = colors || getColors();
+
+            drawGradient(ctx, WIDTH, HEIGHT, color1, color2, angle);
+            drawDiagonalLines(ctx, WIDTH, HEIGHT);
+            drawText(ctx, title, subject, WIDTH, HEIGHT);
+        }
+
+        function updatePreview() {
+            const title = document.getElementById('title').value || 'Titre';
+            const subject = document.getElementById('subject').value;
+            const angle = parseInt(document.getElementById('angle').value);
+
+            drawTile(ctx, title, subject, currentType, angle);
+        }
+
+        function downloadCurrent() {
+            const title = document.getElementById('title').value || 'tuile';
+            const link = document.createElement('a');
+            link.download = title.replace(/[^a-z0-9]/gi, '_') + '.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+
+        function addToList() {
+            const title = document.getElementById('title').value || 'Titre';
+            const subject = document.getElementById('subject').value;
+            const angle = parseInt(document.getElementById('angle').value);
+            const colors = getColors();
+
+            const tile = {
+                id: Date.now(),
+                title,
+                subject,
+                type: currentType,
+                angle,
+                colors: [...colors]
+            };
+
+            tilesList.push(tile);
+            colorIndex++;
+            renderTilesList();
+
+            // Reset form
+            document.getElementById('title').value = '';
+            document.getElementById('subject').value = '';
+            updatePreview();
+        }
+
+        function renderTilesList() {
+            const container = document.getElementById('tilesList');
+            container.innerHTML = '';
+
+            tilesList.forEach((tile, index) => {
+                const div = document.createElement('div');
+                div.className = 'tile-item';
+
+                const miniCanvas = document.createElement('canvas');
+                miniCanvas.width = 300;
+                miniCanvas.height = 200;
+                const miniCtx = miniCanvas.getContext('2d');
+                drawTile(miniCtx, tile.title, tile.subject, tile.type, tile.angle, tile.colors);
+
+                div.innerHTML = `
+                    <div class="tile-info">
+                        <strong>${tile.title}</strong><br>
+                        <small>${tile.subject.replace(/\n/g, ' | ') || '(pas de sujet)'}</small>
+                    </div>
+                    <div class="tile-actions">
+                        <button class="btn-dl" onclick="downloadTile(${index})">Telecharger</button>
+                        <button class="btn-del" onclick="deleteTile(${index})">Supprimer</button>
+                    </div>
+                `;
+
+                div.insertBefore(miniCanvas, div.firstChild);
+                container.appendChild(div);
+            });
+        }
+
+        function downloadTile(index) {
+            const tile = tilesList[index];
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = 300;
+            tempCanvas.height = 200;
+            const tempCtx = tempCanvas.getContext('2d');
+            drawTile(tempCtx, tile.title, tile.subject, tile.type, tile.angle, tile.colors);
+
+            const link = document.createElement('a');
+            link.download = tile.title.replace(/[^a-z0-9]/gi, '_') + '.png';
+            link.href = tempCanvas.toDataURL('image/png');
+            link.click();
+        }
+
+        function deleteTile(index) {
+            tilesList.splice(index, 1);
+            renderTilesList();
+        }
+
+        async function downloadAll() {
+            if (tilesList.length === 0) {
+                alert('Ajoutez des tuiles a la liste d\'abord!');
+                return;
+            }
+
+            const zip = new JSZip();
+
+            tilesList.forEach((tile, index) => {
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = 300;
+                tempCanvas.height = 200;
+                const tempCtx = tempCanvas.getContext('2d');
+                drawTile(tempCtx, tile.title, tile.subject, tile.type, tile.angle, tile.colors);
+
+                const dataUrl = tempCanvas.toDataURL('image/png');
+                const base64 = dataUrl.split(',')[1];
+                const filename = String(index + 1).padStart(2, '0') + '_' + tile.title.replace(/[^a-z0-9]/gi, '_') + '.png';
+                zip.file(filename, base64, {base64: true});
+            });
+
+            const blob = await zip.generateAsync({type: 'blob'});
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'tuiles_moodle.zip';
+            link.click();
+        }
+
+        // Initial preview
+        updatePreview();
+    </script>
+</body>
+</html>

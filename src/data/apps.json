@@ -1,0 +1,52 @@
+[
+  {
+    "id": "cloze-editor",
+    "name": "Éditeur Cloze (Avancé)",
+    "tagline": "Éditeur WYSIWYG de questions Cloze",
+    "description": "Créez des questions multichoix, réponses courtes et numériques directement dans un éditeur riche. Copiez-collez simplement le code dans Moodle.",
+    "path": "/apps/cloze-editor/index.html",
+    "icon": "FileCode",
+    "color": "#f6921e",
+    "category": "Éditeur"
+  },
+  {
+    "id": "style-generator",
+    "name": "Générateur de Style",
+    "tagline": "Bannières et Boutons Moodle",
+    "description": "Générez des éléments visuels cohérents pour vos cours Moodle. Personnalisez les couleurs, les icônes et le texte en quelques clics.",
+    "path": "/apps/style-generator/index.html",
+    "icon": "Palette",
+    "color": "#3b82f6",
+    "category": "Design"
+  },
+  {
+    "id": "tile-generator",
+    "name": "Générateur de Tuiles",
+    "tagline": "Icons dynamiques pour sections",
+    "description": "Créez des tuiles visuelles attrayantes pour organiser vos sections de cours. Exportez-les instantanément pour une intégration facile.",
+    "path": "/apps/tile-generator/index.html",
+    "icon": "LayoutGrid",
+    "color": "#10b981",
+    "category": "Design"
+  },
+  {
+    "id": "youtube-interactive",
+    "name": "YouTube Interactif",
+    "tagline": "Ajoutez des interactions à vos vidéos",
+    "description": "Insérez des questions, des pauses et des feedbacks directement sur des vidéos YouTube. Exportez au format SCORM pour un suivi complet.",
+    "path": "/apps/youtube-interactive/index.html",
+    "icon": "Youtube",
+    "color": "#ef4444",
+    "category": "Interactivité"
+  },
+  {
+    "id": "moodle-cloze-legacy",
+    "name": "Éditeur Cloze (Standard)",
+    "tagline": "Interface simplifiée pour Cloze",
+    "description": "L'éditeur classique pour générer rapidement des questions de type troué pour vos examens et quiz Moodle.",
+    "path": "/apps/moodle-cloze-legacy/index.html",
+    "icon": "Pencil",
+    "color": "#8b5cf6",
+    "category": "Éditeur"
+  }
+]
