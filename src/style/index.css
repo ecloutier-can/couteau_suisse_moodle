@@ -7,7 +7,7 @@
 }
 
 body {
-  @apply bg-app-background text-white font-sans antialiased overflow-hidden;
+  @apply bg-app-background text-white font-sans antialiased;
   background: 
     radial-gradient(circle at 60% 40%, hsla(215, 25%, 25%, 0.4) 0%, transparent 60%),
     radial-gradient(circle at 20% 80%, hsla(230, 30%, 15%, 0.6) 0%, transparent 50%),

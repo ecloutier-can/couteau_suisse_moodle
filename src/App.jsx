@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   FileCode, Palette, LayoutGrid, Youtube, Pencil, 
   Search, ChevronRight, LogIn, UserPlus, HelpCircle, 
-  Settings, Home, Layout, Mail, Info, Terminal, Grid, Shield
+  Settings, Home, Layout, Mail, Info, Terminal, Grid, Shield, Menu, X
 } from 'lucide-react';
 import appsData from './data/apps.json';
 
@@ -11,7 +11,7 @@ const IconMap = {
   FileCode, Palette, LayoutGrid, Youtube, Pencil, Shield
 };
 
-const Sidebar = ({ activeCategory, setCategory }) => {
+const Sidebar = ({ activeCategory, setCategory, isOpen, setIsOpen }) => {
   const categories = [
     { id: 'all', name: 'Tous les outils', icon: Grid },
     { id: 'Éditeur', name: 'Édition & Texte', icon: Pencil },
@@ -20,10 +20,23 @@ const Sidebar = ({ activeCategory, setCategory }) => {
   ];
 
   return (
-    <div className="w-72 bg-app-sidebar/40 backdrop-blur-3xl border-r border-white/5 flex flex-col h-screen fixed left-0 top-0 z-20">
+    <>
+      {/* Overlay for mobile */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-20 md:hidden backdrop-blur-sm" 
+          onClick={() => setIsOpen(false)}
+        />
+      )}
+      <div className={`w-72 bg-app-sidebar/90 md:bg-app-sidebar/40 backdrop-blur-3xl border-r border-white/5 flex flex-col h-screen fixed left-0 top-0 z-30 transition-transform duration-300 ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0`}>
       <div className="p-8 pb-4">
-        <h2 className="text-xs font-bold text-gray-500 uppercase tracking-[0.2em] mb-8">Catégories</h2>
-        <nav className="space-y-4">
+        <h2 className="text-xs font-bold text-gray-500 uppercase tracking-[0.2em] mb-8 flex justify-between items-center">
+          Catégories
+          <button className="md:hidden text-white/50 hover:text-white" onClick={() => setIsOpen(false)}>
+            <X size={16} />
+          </button>
+        </h2>
+        <nav className="space-y-4 overflow-y-auto pr-2 max-h-[60vh] custom-scrollbar">
           {categories.map((cat) => (
             <button
               key={cat.id}
@@ -48,13 +61,20 @@ const Sidebar = ({ activeCategory, setCategory }) => {
         {/* Liens de support retirés */}
       </div>
     </div>
+    </>
   );
 };
 
-const Navbar = ({ searchTerm, setSearchTerm, currentView, setCurrentView }) => (
-  <nav className="h-20 bg-app-navbar/20 backdrop-blur-md border-b border-white/5 flex items-center justify-between px-10 fixed top-0 right-0 left-72 z-10">
-    <div className="flex items-center gap-8">
-      <div className="flex gap-4 text-xs font-bold text-gray-400 uppercase tracking-widest">
+const Navbar = ({ searchTerm, setSearchTerm, currentView, setCurrentView, toggleSidebar }) => (
+  <nav className="h-20 bg-app-navbar/20 backdrop-blur-md border-b border-white/5 flex items-center justify-between px-4 md:px-10 fixed top-0 right-0 left-0 md:left-72 z-10 transition-all duration-300">
+    <div className="flex items-center gap-4 md:gap-8">
+      <button 
+        onClick={toggleSidebar}
+        className="text-gray-400 hover:text-white md:hidden"
+      >
+        <Menu size={24} />
+      </button>
+      <div className="hidden sm:flex gap-4 text-xs font-bold text-gray-400 uppercase tracking-widest">
         <button 
           onClick={() => setCurrentView('home')}
           className={`transition-colors h-full flex items-center px-2 py-1 relative ${currentView === 'home' ? 'text-white' : 'hover:text-white pb-1'}`}
@@ -76,7 +96,7 @@ const Navbar = ({ searchTerm, setSearchTerm, currentView, setCurrentView }) => (
       </div>
     </div>
 
-    <div className="flex-1 max-w-xl px-8">
+    <div className="flex-1 max-w-xl px-4 md:px-8">
       <div className="relative">
         <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={16} />
         <input 
@@ -195,6 +215,7 @@ export default function App() {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeCategory, setActiveCategory] = useState('all');
   const [currentView, setCurrentView] = useState('home');
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const filteredApps = useMemo(() => {
     return appsData.filter(app => {
@@ -208,21 +229,25 @@ export default function App() {
     <div className="flex bg-app-background min-h-screen text-white">
       <Sidebar 
         activeCategory={activeCategory} 
+        isOpen={isSidebarOpen}
+        setIsOpen={setIsSidebarOpen}
         setCategory={(cat) => {
           setActiveCategory(cat);
           setCurrentView('home');
+          setIsSidebarOpen(false);
         }} 
       />
       
-      <div className="flex-1 ml-72">
+      <div className="flex-1 ml-0 md:ml-72 transition-all duration-300 w-full relative">
         <Navbar 
           searchTerm={searchTerm} 
           setSearchTerm={setSearchTerm} 
           currentView={currentView} 
           setCurrentView={setCurrentView}
+          toggleSidebar={() => setIsSidebarOpen(true)}
         />
         
-        <main className="pt-32 px-16 pb-20 max-w-7xl mx-auto">
+        <main className="pt-32 px-6 md:px-16 pb-20 max-w-7xl mx-auto overflow-x-hidden">
           <AnimatePresence mode="wait">
             {currentView === 'home' ? (
               <motion.div
@@ -237,7 +262,7 @@ export default function App() {
                     animate={{ opacity: 1, y: 0 }}
                     className="relative z-10"
                   >
-                    <h1 className="text-6xl font-bold orbitron uppercase tracking-[0.2em] mb-4">
+                    <h1 className="text-4xl md:text-6xl font-bold orbitron uppercase tracking-[0.2em] mb-4">
                       Couteau suisse <span className="text-app-accent">Moodle</span>
                     </h1>
                     <p className="text-sm font-medium text-gray-500 uppercase tracking-[0.3em]">
