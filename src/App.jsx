@@ -172,7 +172,7 @@ export default function App() {
                 Couteau suisse <span className="text-app-accent">Moodle</span>
               </h1>
               <p className="text-sm font-medium text-gray-500 uppercase tracking-[0.3em]">
-                Premium high-tech App Store for Orbitron
+                DES OUTILS POUR DYNAMISER TON COURS MOODLE
               </p>
             </motion.div>
             {/* Background halo */}
