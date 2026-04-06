@@ -189,16 +189,7 @@ export default function App() {
           )}
         </main>
 
-        <footer className="px-16 py-10 border-t border-white/5 flex justify-between items-center text-[10px] text-gray-600 font-bold uppercase tracking-widest">
-          <div className="flex gap-8">
-            {/* Pied de page simplifié */}
-          </div>
-          <div className="flex gap-6 opacity-30">
-            <span>X</span>
-            <span>IG</span>
-            <span>YT</span>
-          </div>
-        </footer>
+        {/* Footer removed for future expansion */}
       </div>
     </div>
   );
