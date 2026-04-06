@@ -34,7 +34,7 @@
     "name": "YouTube Interactif",
     "tagline": "Ajoutez des interactions à vos vidéos",
     "description": "Insérez des questions, des pauses et des feedbacks directement sur des vidéos YouTube. Exportez au format SCORM pour un suivi complet.",
-    "path": "apps/youtube-interactive/index.html",
+    "path": "https://ecloutier-can.github.io/MoodleTube/",
     "icon": "Youtube",
     "color": "#ef4444",
     "category": "Interactivité"
