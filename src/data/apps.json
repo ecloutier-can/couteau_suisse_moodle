@@ -38,15 +38,5 @@
     "icon": "Youtube",
     "color": "#ef4444",
     "category": "Interactivité"
-  },
-  {
-    "id": "moodle-cloze-legacy",
-    "name": "Éditeur Cloze (Standard)",
-    "tagline": "Interface simplifiée pour Cloze",
-    "description": "L'éditeur classique pour générer rapidement des questions de type troué pour vos examens et quiz Moodle.",
-    "path": "apps/moodle-cloze-legacy/index.html",
-    "icon": "Pencil",
-    "color": "#8b5cf6",
-    "category": "Éditeur"
   }
 ]
