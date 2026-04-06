@@ -51,13 +51,28 @@ const Sidebar = ({ activeCategory, setCategory }) => {
   );
 };
 
-const Navbar = ({ searchTerm, setSearchTerm }) => (
+const Navbar = ({ searchTerm, setSearchTerm, currentView, setCurrentView }) => (
   <nav className="h-20 bg-app-navbar/20 backdrop-blur-md border-b border-white/5 flex items-center justify-between px-10 fixed top-0 right-0 left-72 z-10">
     <div className="flex items-center gap-8">
       <div className="flex gap-4 text-xs font-bold text-gray-400 uppercase tracking-widest">
-        <span className="text-white">Accueil</span>
-        <span className="hover:text-white cursor-pointer transition-colors">A Propos</span>
-        <span className="hover:text-white cursor-pointer transition-colors">Contact</span>
+        <button 
+          onClick={() => setCurrentView('home')}
+          className={`transition-colors h-full flex items-center px-2 py-1 relative ${currentView === 'home' ? 'text-white' : 'hover:text-white pb-1'}`}
+        >
+          Accueil
+          {currentView === 'home' && (
+            <motion.div layoutId="nav-dot" className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-app-accent rounded-full" />
+          )}
+        </button>
+        <button 
+          onClick={() => setCurrentView('about')}
+          className={`transition-colors h-full flex items-center px-2 py-1 relative ${currentView === 'about' ? 'text-white' : 'hover:text-white pb-1'}`}
+        >
+          A Propos
+          {currentView === 'about' && (
+            <motion.div layoutId="nav-dot" className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-app-accent rounded-full" />
+          )}
+        </button>
       </div>
     </div>
 
@@ -137,9 +152,49 @@ const AppCard = ({ app }) => {
   );
 };
 
+const AboutView = () => (
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    className="max-w-4xl mx-auto py-20"
+  >
+    <div className="glass-panel p-16 space-y-12">
+      <div className="space-y-6">
+        <h2 className="text-4xl font-bold orbitron text-app-accent uppercase tracking-widest">Vision Pédagogique</h2>
+        <p className="text-gray-300 leading-relaxed text-lg font-light">
+          Le <span className="text-white font-bold">Couteau suisse Moodle</span> est un écosystème d'outils numériques conçus pour transformer l'expérience d'apprentissage. Notre mission est d'offrir aux enseignants des solutions intuitives et performantes pour créer du contenu pédagogique interactif et visuellement engageant.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="bg-white/5 p-8 rounded-2xl border border-white/5">
+          <h3 className="text-white font-bold uppercase text-xs tracking-widest mb-4">Simplicité & Accessibilité</h3>
+          <p className="text-sm text-gray-400 leading-relaxed">
+            Chaque outil est pensé pour être utilisé instantanément, sans configuration complexe. Générez, copiez, et intégrez directement dans vos cours Moodle.
+          </p>
+        </div>
+        <div className="bg-white/5 p-8 rounded-2xl border border-white/5">
+          <h3 className="text-white font-bold uppercase text-xs tracking-widest mb-4">Excellence Visuelle</h3>
+          <p className="text-sm text-gray-400 leading-relaxed">
+            Nous croyons qu'un beau design favorise l'engagement. Nos générateurs assurent une cohérence graphique exceptionnelle pour tout votre matériel didactique.
+          </p>
+        </div>
+      </div>
+
+      <div className="pt-12 border-t border-white/5">
+        <h2 className="text-2xl font-bold orbitron text-white uppercase tracking-widest mb-6">Évolution & Futur</h2>
+        <p className="text-gray-400 leading-relaxed">
+          Ce portail est une plateforme vivante. De nouvelles applications et fonctionnalités seront ajoutées régulièrement pour répondre aux évolutions de l'enseignement hybride. Restez à l'affût des prochaines versions !
+        </p>
+      </div>
+    </div>
+  </motion.div>
+);
+
 export default function App() {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeCategory, setActiveCategory] = useState('all');
+  const [currentView, setCurrentView] = useState('home');
 
   const filteredApps = useMemo(() => {
     return appsData.filter(app => {
@@ -151,44 +206,68 @@ export default function App() {
 
   return (
     <div className="flex bg-app-background min-h-screen text-white">
-      <Sidebar activeCategory={activeCategory} setCategory={setActiveCategory} />
+      <Sidebar 
+        activeCategory={activeCategory} 
+        setCategory={(cat) => {
+          setActiveCategory(cat);
+          setCurrentView('home');
+        }} 
+      />
       
       <div className="flex-1 ml-72">
-        <Navbar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+        <Navbar 
+          searchTerm={searchTerm} 
+          setSearchTerm={setSearchTerm} 
+          currentView={currentView} 
+          setCurrentView={setCurrentView}
+        />
         
         <main className="pt-32 px-16 pb-20 max-w-7xl mx-auto">
-          <header className="mb-20 text-center relative">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="relative z-10"
-            >
-              <h1 className="text-6xl font-bold orbitron uppercase tracking-[0.2em] mb-4">
-                Couteau suisse <span className="text-app-accent">Moodle</span>
-              </h1>
-              <p className="text-sm font-medium text-gray-500 uppercase tracking-[0.3em]">
-                DES OUTILS POUR DYNAMISER TON COURS MOODLE
-              </p>
-            </motion.div>
-            {/* Background halo */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-app-accent/5 blur-[150px] -z-10 rounded-full" />
-          </header>
+          <AnimatePresence mode="wait">
+            {currentView === 'home' ? (
+              <motion.div
+                key="home"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              >
+                <header className="mb-20 text-center relative">
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="relative z-10"
+                  >
+                    <h1 className="text-6xl font-bold orbitron uppercase tracking-[0.2em] mb-4">
+                      Couteau suisse <span className="text-app-accent">Moodle</span>
+                    </h1>
+                    <p className="text-sm font-medium text-gray-500 uppercase tracking-[0.3em]">
+                      DES OUTILS POUR DYNAMISER TON COURS MOODLE
+                    </p>
+                  </motion.div>
+                  {/* Background halo */}
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-app-accent/5 blur-[150px] -z-10 rounded-full" />
+                </header>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
-            <AnimatePresence mode="popLayout">
-              {filteredApps.map((app) => (
-                <AppCard key={app.id} app={app} />
-              ))}
-            </AnimatePresence>
-          </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+                  <AnimatePresence mode="popLayout">
+                    {filteredApps.map((app) => (
+                      <AppCard key={app.id} app={app} />
+                    ))}
+                  </AnimatePresence>
+                </div>
 
-          {filteredApps.length === 0 && (
-            <div className="text-center py-40 text-gray-600 uppercase tracking-[0.4em] text-xs">
-              Aucun outil trouvé
-            </div>
-          )}
+                {filteredApps.length === 0 && (
+                  <div className="text-center py-40 text-gray-600 uppercase tracking-[0.4em] text-xs">
+                    Aucun outil trouvé
+                  </div>
+                )}
+              </motion.div>
+            ) : (
+              <AboutView key="about" />
+            )}
+          </AnimatePresence>
         </main>
-
+        
         {/* Footer removed for future expansion */}
       </div>
     </div>
