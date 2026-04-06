@@ -45,11 +45,7 @@ const Sidebar = ({ activeCategory, setCategory }) => {
       </div>
 
       <div className="mt-auto p-8 pt-4 space-y-6">
-        <div className="pt-8 border-t border-white/5 text-[11px] text-gray-600 font-medium">
-          <p className="mb-2">A PROPOS</p>
-          <p className="mb-2">DOCUMENTATION</p>
-          <p>SUPPORT</p>
-        </div>
+        {/* Liens de support retirés */}
       </div>
     </div>
   );
