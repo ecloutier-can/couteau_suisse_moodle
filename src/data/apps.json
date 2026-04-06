@@ -44,7 +44,7 @@
     "name": "Éditeur Anti-plagiat",
     "tagline": "Éditeur de confiance",
     "description": "Éditeur d'évaluation avec vérification de présence, suivi webcam et blocage du presse-papier pour sécuriser vos travaux.",
-    "path": "https://vercel.com/ecloutier-cans-projects/editeur-antiplagiat",
+    "path": "https://editeur-antiplagiat.vercel.app/",
     "icon": "Shield",
     "color": "#a855f7",
     "category": "Éditeur"
