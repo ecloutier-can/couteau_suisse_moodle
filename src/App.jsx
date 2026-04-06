@@ -14,7 +14,7 @@ const IconMap = {
 const Sidebar = ({ activeCategory, setCategory }) => {
   const categories = [
     { id: 'all', name: 'Tous les outils', icon: Grid },
-    { id: 'Editeur', name: 'Édition & Texte', icon: Pencil },
+    { id: 'Éditeur', name: 'Édition & Texte', icon: Pencil },
     { id: 'Design', name: 'Design Visuel', icon: Palette },
     { id: 'Interactivité', name: 'Interactivité', icon: Youtube },
   ];
