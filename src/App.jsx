@@ -123,13 +123,10 @@ const AppCard = ({ app }) => {
               <p className="text-[11px] text-gray-400 leading-relaxed mb-6 px-2 line-clamp-3">
                 {app.description}
               </p>
-              <div className="flex gap-2 justify-center">
+              <div className="flex justify-center">
                 <a href={app.path} target="_blank" rel="noopener" className="bg-app-accent text-white px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider hover:bg-app-active transition-colors">
                   Démarrer
                 </a>
-                <button className="bg-white/10 text-white px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-wider hover:bg-white/20 transition-colors">
-                  Détails
-                </button>
               </div>
             </motion.div>
           )}
