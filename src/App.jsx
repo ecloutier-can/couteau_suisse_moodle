@@ -3,12 +3,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   FileCode, Palette, LayoutGrid, Youtube, Pencil, 
   Search, ChevronRight, LogIn, UserPlus, HelpCircle, 
-  Settings, Home, Layout, Mail, Info, Terminal, Grid, Shield, Menu, X
+  Settings, Home, Layout, Mail, Info, Terminal, Grid, Shield, Menu, X, Layers
 } from 'lucide-react';
 import appsData from './data/apps.json';
 
 const IconMap = {
-  FileCode, Palette, LayoutGrid, Youtube, Pencil, Shield
+  FileCode, Palette, LayoutGrid, Youtube, Pencil, Shield, Layers
 };
 
 const Sidebar = ({ activeCategory, setCategory, isOpen, setIsOpen }) => {

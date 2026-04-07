@@ -48,5 +48,15 @@
     "icon": "Shield",
     "color": "#a855f7",
     "category": "Éditeur"
+  },
+  {
+    "id": "lumi-education",
+    "name": "Lumi Education",
+    "tagline": "Créateur H5P Interactif",
+    "description": "Créez, modifiez et partagez du contenu interactif H5P gratuitement. Idéal pour concevoir des vidéos interactives et des quiz hors ligne.",
+    "path": "https://lumi.education/fr/",
+    "icon": "Layers",
+    "color": "#3b82f6",
+    "category": "Éditeur"
   }
 ]
