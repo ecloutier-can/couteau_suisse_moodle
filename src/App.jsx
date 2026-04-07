@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  FileCode, Palette, LayoutGrid, Youtube, Pencil, Search, 
+  FileCode, Palette, LayoutGrid, Youtube, Pencil, Search as SearchIcon, 
   ChevronRight, LogIn, UserPlus, HelpCircle, Settings, 
   Home, Layout, Mail, Info, Terminal, Grid, Shield, Menu, X, Layers, Brain 
 } from 'lucide-react';
@@ -99,7 +99,7 @@ const Navbar = ({ searchTerm, setSearchTerm, currentView, setCurrentView, toggle
 
     <div className="flex-1 max-w-xl px-4 md:px-8">
       <div className="relative">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={16} />
+        <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={16} />
         <input 
           type="text" 
           placeholder="Rechercher une application..."
