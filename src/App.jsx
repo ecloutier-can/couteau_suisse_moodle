@@ -1,9 +1,9 @@
 import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  FileCode, Palette, LayoutGrid, Youtube, Pencil, 
-  Search, ChevronRight, LogIn, UserPlus, HelpCircle, 
-  Settings, Home, Layout, Mail, Info, Terminal, Grid, Shield, Menu, X, Layers, Brain
+  FileCode, Palette, LayoutGrid, Youtube, Pencil, Search, 
+  ChevronRight, LogIn, UserPlus, HelpCircle, Settings, 
+  Home, Layout, Mail, Info, Terminal, Grid, Shield, Menu, X, Layers, Brain 
 } from 'lucide-react';
 import appsData from './data/apps.json';
 
