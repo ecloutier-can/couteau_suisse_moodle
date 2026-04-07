@@ -2,13 +2,12 @@ import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   FileCode, Palette, LayoutGrid, Youtube, Pencil, 
-  Search, ChevronRight, LogIn, UserPlus, HelpCircle, 
-  Settings, Home, Layout, Mail, Info, Terminal, Grid, Shield, Menu, X, Layers
+  Settings, Home, Layout, Mail, Info, Terminal, Grid, Shield, Menu, X, Layers, Brain
 } from 'lucide-react';
 import appsData from './data/apps.json';
 
 const IconMap = {
-  FileCode, Palette, LayoutGrid, Youtube, Pencil, Shield, Layers
+  FileCode, Palette, LayoutGrid, Youtube, Pencil, Shield, Layers, Brain
 };
 
 const Sidebar = ({ activeCategory, setCategory, isOpen, setIsOpen }) => {
@@ -17,6 +16,7 @@ const Sidebar = ({ activeCategory, setCategory, isOpen, setIsOpen }) => {
     { id: 'Éditeur', name: 'Édition & Texte', icon: Pencil },
     { id: 'Design', name: 'Design Visuel', icon: Palette },
     { id: 'Interactivité', name: 'Interactivité', icon: Youtube },
+    { id: 'Connaissance', name: 'Connaissance', icon: Brain },
   ];
 
   return (

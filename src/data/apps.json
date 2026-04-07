@@ -58,5 +58,15 @@
     "icon": "Layers",
     "color": "#3b82f6",
     "category": "Éditeur"
+  },
+  {
+    "id": "moodle-notebooklm",
+    "name": "Questions sur Moodle ?",
+    "tagline": "Posez-moi votre question !",
+    "description": "Bénéficiez d'une base de connaissances interactive utilisant la technologie NotebookLM pour répondre à toutes vos interrogations sur Moodle.",
+    "path": "https://notebooklm.google.com/notebook/c6698f93-182f-4af6-9abb-7db42ebb6cf9/preview",
+    "icon": "Brain",
+    "color": "#f59e0b",
+    "category": "Connaissance"
   }
 ]
