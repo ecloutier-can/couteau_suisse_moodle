@@ -94,6 +94,15 @@ const Navbar = ({ searchTerm, setSearchTerm, currentView, setCurrentView, toggle
             <motion.div layoutId="nav-dot" className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-app-accent rounded-full" />
           )}
         </button>
+        <button 
+          onClick={() => setCurrentView('contributors')}
+          className={`transition-colors h-full flex items-center px-2 py-1 relative ${currentView === 'contributors' ? 'text-white' : 'hover:text-white pb-1'}`}
+        >
+          Contributeurs
+          {currentView === 'contributors' && (
+            <motion.div layoutId="nav-dot" className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-app-accent rounded-full" />
+          )}
+        </button>
       </div>
     </div>
 
@@ -212,6 +221,38 @@ const AboutView = () => (
   </motion.div>
 );
 
+const ContributorsView = () => (
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    className="max-w-4xl mx-auto py-20"
+  >
+    <div className="glass-panel p-16 space-y-12">
+      <div className="space-y-6 text-center">
+        <h2 className="text-4xl font-bold orbitron text-app-accent uppercase tracking-widest">Contributeurs</h2>
+        <p className="text-gray-300 leading-relaxed text-lg font-light">
+          Merci aux différentes personnes qui ont contribué au développement des applications disponibles.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {[
+          { name: "René Bélanger", institution: "Cégep de Matane" },
+          { name: "Daniel Plante", institution: "Cégep Marie-Victorin" },
+          { name: "Stéphanie Côté", institution: "Cégep Édouard-Montpetit" },
+          { name: "Carl Rousseau", institution: "Cégep de Thetford" },
+          { name: "Eric Cloutier", institution: "Cégep de Thetford" }
+        ].map((contributor, index) => (
+          <div key={index} className="bg-white/5 p-8 rounded-2xl border border-white/5 hover:border-app-accent/30 transition-colors group">
+            <h3 className="text-white font-bold uppercase text-sm tracking-widest group-hover:text-app-accent transition-colors">{contributor.name}</h3>
+            <p className="text-xs text-gray-500 tracking-wider mt-2">{contributor.institution}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </motion.div>
+);
+
 export default function App() {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeCategory, setActiveCategory] = useState('all');
@@ -288,8 +329,10 @@ export default function App() {
                   </div>
                 )}
               </motion.div>
-            ) : (
+            ) : currentView === 'about' ? (
               <AboutView key="about" />
+            ) : (
+              <ContributorsView key="contributors" />
             )}
           </AnimatePresence>
         </main>
