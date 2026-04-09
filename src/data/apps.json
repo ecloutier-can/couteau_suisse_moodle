@@ -68,5 +68,15 @@
     "icon": "Brain",
     "color": "#f59e0b",
     "category": "Connaissance"
+  },
+  {
+    "id": "iagraphie",
+    "name": "IAgraphie",
+    "tagline": "Déclaration d'intégrité (IA)",
+    "description": "Générez une déclaration d'intégrité intellectuelle pour documenter l'usage de l'IA dans vos travaux de façon transparente et conforme.",
+    "path": "https://ecloutier-can.github.io/IAgraphie/",
+    "icon": "Shield",
+    "color": "#4f46e5",
+    "category": "Éditeur"
   }
 ]
