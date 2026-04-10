@@ -250,6 +250,64 @@ const ContributorsView = () => (
   </motion.div>
 );
 
+const HeroTile = () => {
+  const [isHovered, setIsHovered] = useState(false);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      whileHover={{ scale: 1.01 }}
+      className={`relative w-full min-h-[16rem] md:h-80 p-8 md:p-16 flex flex-col md:flex-row items-center justify-between transition-all duration-700 rounded-[2.5rem] mb-20 overflow-hidden cursor-default ${isHovered ? 'glass-panel active-glow border-app-accent/30' : 'glass-panel'
+        }`}
+    >
+      <div className="flex flex-col items-center md:items-start text-center md:text-left z-10">
+        <motion.h1
+          animate={isHovered ? { color: '#f6921e', textShadow: '0 0 30px rgba(246, 146, 30, 0.4)' } : { color: '#ffffff' }}
+          className="text-6xl md:text-9xl font-black orbitron uppercase tracking-[0.3em] mb-4 transition-colors duration-700"
+        >
+          POP
+        </motion.h1>
+        <div className="space-y-1">
+          <p className="text-xs md:text-sm font-medium text-gray-500 uppercase tracking-[0.4em]">
+            Plateforme d'Outils Pédagogiques
+          </p>
+          <p className="text-[10px] font-bold text-app-accent/60 uppercase tracking-[0.6em]">
+            Booster votre enseignement
+          </p>
+        </div>
+      </div>
+
+      <div className="hidden lg:flex flex-col items-end text-right z-10">
+        <div className="bg-white/5 p-6 rounded-2xl border border-white/5 backdrop-blur-md">
+          <p className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Status</p>
+          <div className="flex items-center gap-2 text-app-accent">
+            <div className="w-2 h-2 rounded-full bg-app-accent animate-pulse" />
+            <span className="text-xs font-bold orbitron uppercase">Système Actif</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Background radial effects */}
+      <AnimatePresence>
+        {isHovered && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 z-0 pointer-events-none"
+          >
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-app-accent/10 blur-[150px] rounded-full" />
+            <div className="absolute top-0 right-0 w-64 h-64 bg-app-accent/5 blur-3xl rounded-full translate-x-1/2 -translate-y-1/2" />
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
+  );
+};
+
 export default function App() {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeCategory, setActiveCategory] = useState('all');
@@ -295,25 +353,7 @@ export default function App() {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
               >
-                <header className="mb-20 text-center relative">
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="relative z-10"
-                  >
-                    <h1 className="text-4xl md:text-8xl font-black orbitron uppercase tracking-[0.3em] mb-4 text-white hover:text-app-accent transition-colors duration-700 drop-shadow-[0_0_25px_rgba(246,146,30,0.3)]">
-                      POP
-                    </h1>
-                    <p className="text-sm font-medium text-gray-500 uppercase tracking-[0.4em] mb-2">
-                      PLATEFORME D'OUTILS PÉDAGOGIQUES
-                    </p>
-                    <p className="text-[10px] font-bold text-app-accent/60 uppercase tracking-[0.5em]">
-                      BOOSTER VOTRE ENSEIGNEMENT
-                    </p>
-                  </motion.div>
-                  {/* Background halo */}
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-app-accent/5 blur-[150px] -z-10 rounded-full" />
-                </header>
+                <HeroTile />
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
                   <AnimatePresence mode="popLayout">
