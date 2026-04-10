@@ -3,12 +3,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   FileCode, Palette, LayoutGrid, Youtube, Pencil, Search as SearchIcon,
   ChevronRight, LogIn, UserPlus, HelpCircle, Settings,
-  Home, Layout, Mail, Info, Terminal, Grid, Shield, Menu, X, Layers, Brain, Vote
+  Home, Layout, Mail, Info, Terminal, Grid, Shield, Menu, X, Layers, Brain, Vote, MessageSquarePlus
 } from 'lucide-react';
 import appsData from './data/apps.json';
 
 const IconMap = {
-  FileCode, Palette, LayoutGrid, Youtube, Pencil, Shield, Layers, Brain, Vote
+  FileCode, Palette, LayoutGrid, Youtube, Pencil, Shield, Layers, Brain, Vote, MessageSquarePlus
 };
 
 const Sidebar = ({ activeCategory, setCategory, isOpen, setIsOpen }) => {
@@ -18,6 +18,7 @@ const Sidebar = ({ activeCategory, setCategory, isOpen, setIsOpen }) => {
     { id: 'Design', name: 'Design Visuel', icon: Palette },
     { id: 'Interactivité', name: 'Interactivité', icon: Youtube },
     { id: 'Connaissance', name: 'Connaissance', icon: Brain },
+    { id: 'Contribution', name: 'Contribution', icon: MessageSquarePlus },
   ];
 
   return (

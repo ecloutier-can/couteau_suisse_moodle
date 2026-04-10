@@ -88,5 +88,15 @@
     "icon": "Vote",
     "color": "#10b981",
     "category": "Interactivité"
+  },
+  {
+    "id": "suggest-tool",
+    "name": "Proposer un outil ou un ajout",
+    "tagline": "Aidez-nous à faire grandir POP !",
+    "description": "Vous utilisez un outil génial qui ne figure pas encore ici ? Partagez-le avec la communauté en quelques clics via notre formulaire dédié.",
+    "path": "https://forms.cloud.microsoft/r/4V7FgpbtLd",
+    "icon": "MessageSquarePlus",
+    "color": "#f6921e",
+    "category": "Contribution"
   }
 ]
