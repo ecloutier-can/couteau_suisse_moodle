@@ -5,7 +5,7 @@
     "tagline": "Éditeur WYSIWYG de questions Cloze",
     "description": "Créez des questions multichoix, réponses courtes et numériques directement dans un éditeur riche. Copiez-collez simplement le code dans Moodle.",
     "path": "apps/cloze-editor/index.html",
-    "icon": "FileCode",
+    "imageIcon": "/icons/cloze-editor.png",
     "color": "#f6921e",
     "category": "Éditeur"
   },
@@ -15,7 +15,7 @@
     "tagline": "Bannières et Boutons Moodle",
     "description": "Générez des éléments visuels cohérents pour vos cours Moodle. Personnalisez les couleurs, les icônes et le texte en quelques clics.",
     "path": "apps/style-generator/index.html",
-    "icon": "Palette",
+    "imageIcon": "/icons/style-generator.png",
     "color": "#3b82f6",
     "category": "Design"
   },
@@ -25,7 +25,7 @@
     "tagline": "Icons dynamiques pour sections",
     "description": "Créez des tuiles visuelles attrayantes pour organiser vos sections de cours. Exportez-les instantanément pour une intégration facile.",
     "path": "apps/tile-generator/index.html",
-    "icon": "LayoutGrid",
+    "imageIcon": "/icons/tile-generator.png",
     "color": "#10b981",
     "category": "Design"
   },
@@ -35,7 +35,7 @@
     "tagline": "Ajoutez des interactions à vos vidéos",
     "description": "Insérez des questions, des pauses et des feedbacks directement sur des vidéos YouTube. Exportez au format SCORM pour un suivi complet.",
     "path": "https://ecloutier-can.github.io/MoodleTube/",
-    "icon": "Youtube",
+    "imageIcon": "/icons/youtube-interactive.png",
     "color": "#ef4444",
     "category": "Interactivité"
   },
@@ -45,7 +45,7 @@
     "tagline": "Éditeur de confiance",
     "description": "Éditeur d'évaluation avec vérification de présence, suivi webcam et blocage du presse-papier pour sécuriser vos travaux.",
     "path": "https://editeur-antiplagiat.vercel.app/",
-    "icon": "Shield",
+    "imageIcon": "/icons/antiplagiat.png",
     "color": "#a855f7",
     "category": "Éditeur"
   },
@@ -55,7 +55,7 @@
     "tagline": "Créateur H5P Interactif",
     "description": "Créez, modifiez et partagez du contenu interactif H5P gratuitement. Idéal pour concevoir des vidéos interactives et des quiz hors ligne.",
     "path": "https://lumi.education/fr/",
-    "icon": "Layers",
+    "imageIcon": "/icons/lumi.png",
     "color": "#3b82f6",
     "category": "Éditeur"
   },
@@ -65,7 +65,7 @@
     "tagline": "Posez-moi votre question !",
     "description": "Bénéficiez d'une base de connaissances interactive utilisant la technologie NotebookLM pour répondre à toutes vos interrogations sur Moodle.",
     "path": "https://notebooklm.google.com/notebook/c6698f93-182f-4af6-9abb-7db42ebb6cf9",
-    "icon": "Brain",
+    "imageIcon": "/icons/notebooklm.png",
     "color": "#f59e0b",
     "category": "Connaissance"
   },
@@ -75,7 +75,7 @@
     "tagline": "Déclaration d'intégrité (IA)",
     "description": "Générez une déclaration d'intégrité intellectuelle pour documenter l'usage de l'IA dans vos travaux de façon transparente et conforme.",
     "path": "https://ecloutier-can.github.io/IAgraphie/",
-    "icon": "Shield",
+    "imageIcon": "/icons/iagraphie.png",
     "color": "#4f46e5",
     "category": "Éditeur"
   },
@@ -85,7 +85,7 @@
     "tagline": "Sondages et interactions en temps réel",
     "description": "Engagez votre public avec des sondages en direct, des compétitions et du brainstorming collaboratif. Simple, accessible et inclusif.",
     "path": "https://online-vote-vert.vercel.app/",
-    "icon": "Vote",
+    "imageIcon": "/icons/vote.png",
     "color": "#10b981",
     "category": "Interactivité"
   },
@@ -95,8 +95,9 @@
     "tagline": "Aidez-nous à faire grandir POP !",
     "description": "Vous utilisez un outil génial qui ne figure pas encore ici ? Partagez-le avec la communauté en quelques clics via notre formulaire dédié.",
     "path": "https://forms.cloud.microsoft/r/4V7FgpbtLd",
-    "icon": "MessageSquarePlus",
+    "imageIcon": "/icons/suggest.png",
     "color": "#f6921e",
     "category": "Contribution"
   }
 ]
+

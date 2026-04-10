@@ -141,9 +141,12 @@ const AppCard = ({ app }) => {
         className={`w-full h-72 p-8 flex flex-col items-center justify-center transition-all duration-500 ${isHovered ? 'glass-panel active-glow' : 'glass-panel'
           }`}
       >
-        <div className={`w-20 h-20 rounded-2xl flex items-center justify-center mb-6 shadow-2xl transition-all duration-500 ${isHovered ? 'bg-app-accent text-white rotate-6' : 'bg-white/5 text-gray-300'
-          }`}>
-          <Icon size={40} />
+        <div className={`w-20 h-20 rounded-2xl flex items-center justify-center mb-6 shadow-2xl transition-all duration-500 overflow-hidden ${isHovered ? 'bg-app-accent/20 border border-app-accent/30 rotate-6 p-2' : 'bg-white/5 border border-white/5 p-4'}`}>
+          {app.imageIcon ? (
+            <img src={app.imageIcon} alt={app.name} className="w-full h-full object-contain" />
+          ) : (
+            <Icon size={40} className={isHovered ? 'text-app-accent' : 'text-gray-300'} />
+          )}
         </div>
 
         <h3 className={`text-center font-bold mb-2 transition-colors duration-500 ${isHovered ? 'text-app-accent' : 'text-gray-100'}`}>
@@ -251,6 +254,122 @@ const ContributorsView = () => (
   </motion.div>
 );
 
+const ParticleBackground = () => {
+  const canvasRef = React.useRef(null);
+
+  React.useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let animationFrameId;
+
+    let particles = [];
+    const particleCount = 20;
+
+    const resize = () => {
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+    };
+
+    window.addEventListener('resize', resize);
+    resize();
+
+    class Particle {
+      constructor() {
+        this.reset();
+      }
+      reset() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.size = Math.random() * 2 + 1;
+        this.speedX = Math.random() * 0.4 - 0.2;
+        this.speedY = Math.random() * 0.4 - 0.2;
+        this.opacity = Math.random() * 0.3 + 0.1;
+      }
+      update(mouse) {
+        this.x += this.speedX;
+        this.y += this.speedY;
+
+        if (mouse.x !== null && mouse.y !== null) {
+          const dx = mouse.x - this.x;
+          const dy = mouse.y - this.y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          if (distance < 150) {
+            this.x -= dx / 100;
+            this.y -= dy / 100;
+          }
+        }
+
+        if (this.x < 0 || this.x > canvas.width || this.y < 0 || this.y > canvas.height) {
+          this.reset();
+        }
+      }
+      draw() {
+        ctx.fillStyle = `rgba(246, 146, 30, ${this.opacity})`;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    for (let i = 0; i < particleCount; i++) {
+      particles.push(new Particle());
+    }
+
+    const mouse = { x: null, y: null };
+    const handleMouseMove = (e) => {
+      const rect = canvas.getBoundingClientRect();
+      mouse.x = e.clientX - rect.left;
+      mouse.y = e.clientY - rect.top;
+    };
+
+    const handleMouseLeave = () => {
+      mouse.x = null;
+      mouse.y = null;
+    };
+
+    canvas.parentElement.addEventListener('mousemove', handleMouseMove);
+    canvas.parentElement.addEventListener('mouseleave', handleMouseLeave);
+
+    const animate = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      // Draw connections
+      ctx.strokeStyle = 'rgba(246, 146, 30, 0.05)';
+      ctx.lineWidth = 0.5;
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 100) {
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.stroke();
+          }
+        }
+      }
+
+      particles.forEach(p => {
+        p.update(mouse);
+        p.draw();
+      });
+      animationFrameId = requestAnimationFrame(animate);
+    };
+    animate();
+
+    return () => {
+      window.removeEventListener('resize', resize);
+      canvas.parentElement.removeEventListener('mousemove', handleMouseMove);
+      canvas.parentElement.removeEventListener('mouseleave', handleMouseLeave);
+      cancelAnimationFrame(animationFrameId);
+    };
+  }, []);
+
+  return <canvas ref={canvasRef} className="absolute inset-0 w-full h-full opacity-40 pointer-events-none" />;
+};
+
 const HeroTile = () => {
   const [isHovered, setIsHovered] = useState(false);
 
@@ -261,9 +380,10 @@ const HeroTile = () => {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       whileHover={{ scale: 1.01 }}
-      className={`relative w-full min-h-[16rem] md:h-80 p-8 md:p-16 flex flex-col md:flex-row items-center justify-between transition-all duration-700 rounded-[2.5rem] mb-20 overflow-hidden cursor-default ${isHovered ? 'glass-panel active-glow border-app-accent/30' : 'glass-panel'
+      className={`relative w-full min-h-[16rem] md:h-80 p-8 md:p-16 flex flex-col md:flex-row items-center justify-between transition-all duration-700 rounded-[2.5rem] mb-20 overflow-hidden cursor-default ${isHovered ? 'glass-panel active-glow border-app-accent/30 shadow-[0_0_50px_rgba(246,146,30,0.1)]' : 'glass-panel'
         }`}
     >
+      <ParticleBackground />
       <div className="flex flex-col items-center md:items-start text-center md:text-left z-10">
         <motion.h1
           animate={isHovered ? { color: '#f6921e', textShadow: '0 0 30px rgba(246, 146, 30, 0.4)' } : { color: '#ffffff' }}
