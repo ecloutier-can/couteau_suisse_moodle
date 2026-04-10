@@ -1,14 +1,14 @@
 import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  FileCode, Palette, LayoutGrid, Youtube, Pencil, Search as SearchIcon, 
-  ChevronRight, LogIn, UserPlus, HelpCircle, Settings, 
-  Home, Layout, Mail, Info, Terminal, Grid, Shield, Menu, X, Layers, Brain 
+import {
+  FileCode, Palette, LayoutGrid, Youtube, Pencil, Search as SearchIcon,
+  ChevronRight, LogIn, UserPlus, HelpCircle, Settings,
+  Home, Layout, Mail, Info, Terminal, Grid, Shield, Menu, X, Layers, Brain, Vote
 } from 'lucide-react';
 import appsData from './data/apps.json';
 
 const IconMap = {
-  FileCode, Palette, LayoutGrid, Youtube, Pencil, Shield, Layers, Brain
+  FileCode, Palette, LayoutGrid, Youtube, Pencil, Shield, Layers, Brain, Vote
 };
 
 const Sidebar = ({ activeCategory, setCategory, isOpen, setIsOpen }) => {
@@ -24,44 +24,43 @@ const Sidebar = ({ activeCategory, setCategory, isOpen, setIsOpen }) => {
     <>
       {/* Overlay for mobile */}
       {isOpen && (
-        <div 
-          className="fixed inset-0 bg-black/50 z-20 md:hidden backdrop-blur-sm" 
+        <div
+          className="fixed inset-0 bg-black/50 z-20 md:hidden backdrop-blur-sm"
           onClick={() => setIsOpen(false)}
         />
       )}
       <div className={`w-72 bg-app-sidebar/90 md:bg-app-sidebar/40 backdrop-blur-3xl border-r border-white/5 flex flex-col h-screen fixed left-0 top-0 z-30 transition-transform duration-300 ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0`}>
-      <div className="p-8 pb-4">
-        <h2 className="text-xs font-bold text-gray-500 uppercase tracking-[0.2em] mb-8 flex justify-between items-center">
-          Catégories
-          <button className="md:hidden text-white/50 hover:text-white" onClick={() => setIsOpen(false)}>
-            <X size={16} />
-          </button>
-        </h2>
-        <nav className="space-y-4 overflow-y-auto pr-2 max-h-[60vh] custom-scrollbar">
-          {categories.map((cat) => (
-            <button
-              key={cat.id}
-              onClick={() => setCategory(cat.id)}
-              className={`flex items-center gap-4 w-full p-3 rounded-xl transition-all duration-300 ${
-                activeCategory === cat.id 
-                ? 'bg-app-accent/10 text-app-accent border border-app-accent/20' 
-                : 'text-gray-400 hover:text-white hover:bg-white/5'
-              }`}
-            >
-              <cat.icon size={20} />
-              <span className="font-medium text-sm">{cat.name}</span>
-              {activeCategory === cat.id && (
-                <motion.div layoutId="activeCat" className="ml-auto w-1.5 h-1.5 rounded-full bg-app-accent" />
-              )}
+        <div className="p-8 pb-4">
+          <h2 className="text-xs font-bold text-gray-500 uppercase tracking-[0.2em] mb-8 flex justify-between items-center">
+            Catégories
+            <button className="md:hidden text-white/50 hover:text-white" onClick={() => setIsOpen(false)}>
+              <X size={16} />
             </button>
-          ))}
-        </nav>
-      </div>
+          </h2>
+          <nav className="space-y-4 overflow-y-auto pr-2 max-h-[60vh] custom-scrollbar">
+            {categories.map((cat) => (
+              <button
+                key={cat.id}
+                onClick={() => setCategory(cat.id)}
+                className={`flex items-center gap-4 w-full p-3 rounded-xl transition-all duration-300 ${activeCategory === cat.id
+                    ? 'bg-app-accent/10 text-app-accent border border-app-accent/20'
+                    : 'text-gray-400 hover:text-white hover:bg-white/5'
+                  }`}
+              >
+                <cat.icon size={20} />
+                <span className="font-medium text-sm">{cat.name}</span>
+                {activeCategory === cat.id && (
+                  <motion.div layoutId="activeCat" className="ml-auto w-1.5 h-1.5 rounded-full bg-app-accent" />
+                )}
+              </button>
+            ))}
+          </nav>
+        </div>
 
-      <div className="mt-auto p-8 pt-4 space-y-6">
-        {/* Liens de support retirés */}
+        <div className="mt-auto p-8 pt-4 space-y-6">
+          {/* Liens de support retirés */}
+        </div>
       </div>
-    </div>
     </>
   );
 };
@@ -69,14 +68,14 @@ const Sidebar = ({ activeCategory, setCategory, isOpen, setIsOpen }) => {
 const Navbar = ({ searchTerm, setSearchTerm, currentView, setCurrentView, toggleSidebar }) => (
   <nav className="h-20 bg-app-navbar/20 backdrop-blur-md border-b border-white/5 flex items-center justify-between px-4 md:px-10 fixed top-0 right-0 left-0 md:left-72 z-10 transition-all duration-300">
     <div className="flex items-center gap-4 md:gap-8">
-      <button 
+      <button
         onClick={toggleSidebar}
         className="text-gray-400 hover:text-white md:hidden"
       >
         <Menu size={24} />
       </button>
       <div className="hidden sm:flex gap-4 text-xs font-bold text-gray-400 uppercase tracking-widest">
-        <button 
+        <button
           onClick={() => setCurrentView('home')}
           className={`transition-colors h-full flex items-center px-2 py-1 relative ${currentView === 'home' ? 'text-white' : 'hover:text-white pb-1'}`}
         >
@@ -85,7 +84,7 @@ const Navbar = ({ searchTerm, setSearchTerm, currentView, setCurrentView, toggle
             <motion.div layoutId="nav-dot" className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-app-accent rounded-full" />
           )}
         </button>
-        <button 
+        <button
           onClick={() => setCurrentView('about')}
           className={`transition-colors h-full flex items-center px-2 py-1 relative ${currentView === 'about' ? 'text-white' : 'hover:text-white pb-1'}`}
         >
@@ -94,7 +93,7 @@ const Navbar = ({ searchTerm, setSearchTerm, currentView, setCurrentView, toggle
             <motion.div layoutId="nav-dot" className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-app-accent rounded-full" />
           )}
         </button>
-        <button 
+        <button
           onClick={() => setCurrentView('contributors')}
           className={`transition-colors h-full flex items-center px-2 py-1 relative ${currentView === 'contributors' ? 'text-white' : 'hover:text-white pb-1'}`}
         >
@@ -109,8 +108,8 @@ const Navbar = ({ searchTerm, setSearchTerm, currentView, setCurrentView, toggle
     <div className="flex-1 max-w-xl px-4 md:px-8">
       <div className="relative">
         <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={16} />
-        <input 
-          type="text" 
+        <input
+          type="text"
           placeholder="Rechercher une application..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
@@ -138,13 +137,11 @@ const AppCard = ({ app }) => {
     >
       <motion.div
         animate={isHovered ? { scale: 1.1, translateY: -20 } : { scale: 1, translateY: 0 }}
-        className={`w-full h-72 p-8 flex flex-col items-center justify-center transition-all duration-500 ${
-          isHovered ? 'glass-panel active-glow' : 'glass-panel'
-        }`}
+        className={`w-full h-72 p-8 flex flex-col items-center justify-center transition-all duration-500 ${isHovered ? 'glass-panel active-glow' : 'glass-panel'
+          }`}
       >
-        <div className={`w-20 h-20 rounded-2xl flex items-center justify-center mb-6 shadow-2xl transition-all duration-500 ${
-          isHovered ? 'bg-app-accent text-white rotate-6' : 'bg-white/5 text-gray-300'
-        }`}>
+        <div className={`w-20 h-20 rounded-2xl flex items-center justify-center mb-6 shadow-2xl transition-all duration-500 ${isHovered ? 'bg-app-accent text-white rotate-6' : 'bg-white/5 text-gray-300'
+          }`}>
           <Icon size={40} />
         </div>
 
@@ -154,7 +151,7 @@ const AppCard = ({ app }) => {
 
         <AnimatePresence>
           {isHovered && (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
@@ -269,26 +266,26 @@ export default function App() {
 
   return (
     <div className="flex bg-app-background min-h-screen text-white">
-      <Sidebar 
-        activeCategory={activeCategory} 
+      <Sidebar
+        activeCategory={activeCategory}
         isOpen={isSidebarOpen}
         setIsOpen={setIsSidebarOpen}
         setCategory={(cat) => {
           setActiveCategory(cat);
           setCurrentView('home');
           setIsSidebarOpen(false);
-        }} 
+        }}
       />
-      
+
       <div className="flex-1 ml-0 md:ml-72 transition-all duration-300 w-full relative">
-        <Navbar 
-          searchTerm={searchTerm} 
-          setSearchTerm={setSearchTerm} 
-          currentView={currentView} 
+        <Navbar
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          currentView={currentView}
           setCurrentView={setCurrentView}
           toggleSidebar={() => setIsSidebarOpen(true)}
         />
-        
+
         <main className="pt-32 px-6 md:px-16 pb-20 max-w-7xl mx-auto overflow-x-hidden">
           <AnimatePresence mode="wait">
             {currentView === 'home' ? (
@@ -336,7 +333,7 @@ export default function App() {
             )}
           </AnimatePresence>
         </main>
-        
+
         {/* Footer removed for future expansion */}
       </div>
     </div>

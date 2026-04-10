@@ -78,5 +78,15 @@
     "icon": "Shield",
     "color": "#4f46e5",
     "category": "Éditeur"
+  },
+  {
+    "id": "online-vote",
+    "name": "Votation en ligne",
+    "tagline": "Sondages et interactions en temps réel",
+    "description": "Engagez votre public avec des sondages en direct, des compétitions et du brainstorming collaboratif. Simple, accessible et inclusif.",
+    "path": "https://online-vote-vert.vercel.app/",
+    "icon": "Vote",
+    "color": "#10b981",
+    "category": "Interactivité"
   }
 ]
