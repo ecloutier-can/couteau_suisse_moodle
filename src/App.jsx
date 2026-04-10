@@ -189,7 +189,7 @@ const AboutView = () => (
       <div className="space-y-6">
         <h2 className="text-4xl font-bold orbitron text-app-accent uppercase tracking-widest">Vision Pédagogique</h2>
         <p className="text-gray-300 leading-relaxed text-lg font-light">
-          Le <span className="text-white font-bold">Couteau suisse Moodle</span> est un écosystème d'outils numériques conçus pour transformer l'expérience d'apprentissage. Notre mission est d'offrir aux enseignants des solutions intuitives et performantes pour créer du contenu pédagogique interactif et visuellement engageant.
+          La plateforme <span className="text-white font-bold text-shadow-glow">POP</span> (<span className="text-white/80 italic text-sm">Plateforme d'Outils Pédagogiques</span>) est un écosystème d'outils numériques conçus pour transformer l'expérience d'apprentissage. Notre mission est d'offrir aux enseignants des solutions intuitives et performantes pour créer du contenu pédagogique interactif et visuellement engageant.
         </p>
       </div>
 
@@ -301,11 +301,14 @@ export default function App() {
                     animate={{ opacity: 1, y: 0 }}
                     className="relative z-10"
                   >
-                    <h1 className="text-4xl md:text-6xl font-bold orbitron uppercase tracking-[0.2em] mb-4">
-                      Couteau suisse <span className="text-app-accent">Moodle</span>
+                    <h1 className="text-4xl md:text-8xl font-black orbitron uppercase tracking-[0.3em] mb-4 text-white hover:text-app-accent transition-colors duration-700 drop-shadow-[0_0_25px_rgba(246,146,30,0.3)]">
+                      POP
                     </h1>
-                    <p className="text-sm font-medium text-gray-500 uppercase tracking-[0.3em]">
-                      DES OUTILS POUR DYNAMISER TON COURS MOODLE
+                    <p className="text-sm font-medium text-gray-500 uppercase tracking-[0.4em] mb-2">
+                      PLATEFORME D'OUTILS PÉDAGOGIQUES
+                    </p>
+                    <p className="text-[10px] font-bold text-app-accent/60 uppercase tracking-[0.5em]">
+                      BOOSTER VOTRE ENSEIGNEMENT
                     </p>
                   </motion.div>
                   {/* Background halo */}
