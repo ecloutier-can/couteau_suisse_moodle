@@ -280,7 +280,7 @@ const HeroTile = () => {
         </div>
       </div>
 
-      <div className="hidden lg:flex flex-col items-end z-10">
+      <div className="flex flex-col items-center md:items-end z-10 mt-8 md:mt-0">
         <motion.div
           animate={isHovered ? { rotate: 5, scale: 1.1 } : { rotate: 0, scale: 1 }}
           className="w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden shadow-2xl transition-all duration-700"
