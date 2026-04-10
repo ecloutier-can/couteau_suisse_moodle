@@ -280,14 +280,17 @@ const HeroTile = () => {
         </div>
       </div>
 
-      <div className="hidden lg:flex flex-col items-end text-right z-10">
-        <div className="bg-white/5 p-6 rounded-2xl border border-white/5 backdrop-blur-md">
-          <p className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Status</p>
-          <div className="flex items-center gap-2 text-app-accent">
-            <div className="w-2 h-2 rounded-full bg-app-accent animate-pulse" />
-            <span className="text-xs font-bold orbitron uppercase">Système Actif</span>
-          </div>
-        </div>
+      <div className="hidden lg:flex flex-col items-end z-10">
+        <motion.div
+          animate={isHovered ? { rotate: 5, scale: 1.1 } : { rotate: 0, scale: 1 }}
+          className="w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden shadow-2xl transition-all duration-700"
+        >
+          <img
+            src="/icons/brain-logo.png"
+            alt="Brain Logo"
+            className="w-full h-full object-cover"
+          />
+        </motion.div>
       </div>
 
       {/* Background radial effects */}
