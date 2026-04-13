@@ -142,11 +142,7 @@ const AppCard = ({ app }) => {
           }`}
       >
         <div className={`w-20 h-20 rounded-2xl flex items-center justify-center mb-6 shadow-2xl transition-all duration-500 overflow-hidden ${isHovered ? 'bg-app-accent/20 border border-app-accent/30 rotate-6 p-2' : 'bg-white/5 border border-white/5 p-4'}`}>
-          {app.imageIcon ? (
-            <img src={app.imageIcon} alt={app.name} className="w-full h-full object-contain" />
-          ) : (
-            <Icon size={40} className={isHovered ? 'text-app-accent' : 'text-gray-300'} />
-          )}
+          <Icon size={40} className={isHovered ? 'text-app-accent' : 'text-gray-300'} />
         </div>
 
         <h3 className={`text-center font-bold mb-2 transition-colors duration-500 ${isHovered ? 'text-app-accent' : 'text-gray-100'}`}>
@@ -367,7 +363,7 @@ const ParticleBackground = () => {
     };
   }, []);
 
-  return <canvas ref={canvasRef} className="absolute inset-0 w-full h-full opacity-40 pointer-events-none" />;
+  return <canvas ref={canvasRef} className="absolute inset-0 w-full h-full opacity-40 pointer-events-none z-0" style={{ display: 'block' }} />;
 };
 
 const HeroTile = () => {
@@ -409,7 +405,8 @@ const HeroTile = () => {
           <img
             src="/icons/brain-logo.png"
             alt="Brain Logo"
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover mix-blend-screen brightness-125"
+            style={{ clipPath: 'circle(44% at 50% 50%)', WebkitClipPath: 'circle(44% at 50% 50%)' }}
           />
         </motion.div>
       </div>
