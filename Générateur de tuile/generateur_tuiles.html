@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generateur de Tuiles Moodle</title>
+    <title>Générateur de Tuiles Moodle</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
         * {
             box-sizing: border-box;
@@ -242,7 +243,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Couleurs personnalisees (optionnel)</label>
+                    <label>Couleurs personnalisées (optionnel)</label>
                     <div class="color-preview">
                         <input type="color" id="color1" value="#2980b9">
                         <span>→</span>
@@ -250,6 +251,49 @@
                         <label style="display: inline; margin-left: 10px;">
                             <input type="checkbox" id="useCustomColors"> Utiliser
                         </label>
+                    </div>
+                </div>
+
+                <div style="border-top: 1px solid #444; margin: 20px 0; padding-top: 20px;">
+                    <label style="color: #667eea; text-transform: uppercase; font-size: 12px; letter-spacing: 1px;">Configuration de l'icône</label>
+                </div>
+
+                <div class="form-group">
+                    <label for="iconClass">Icône Font Awesome 6 (ex: fa-solid fa-house)</label>
+                    <input type="text" id="iconClass" placeholder="fa-solid fa-star">
+                    <div class="info-text">Trouvez les noms sur fontawesome.com</div>
+                </div>
+
+                <div class="form-group">
+                    <label>Couleur et Opacité de l'icône</label>
+                    <div class="color-preview">
+                        <input type="color" id="iconColor" value="#ffffff">
+                        <input type="range" id="iconOpacity" min="0" max="100" value="100" style="flex: 1;">
+                        <span class="angle-value" id="iconOpacityValue">100%</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Taille de l'icône</label>
+                    <div class="angle-slider">
+                        <input type="range" id="iconSize" min="10" max="250" value="80">
+                        <span class="angle-value" id="iconSizeValue">80px</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Position de l'icône</label>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <select id="iconHPos">
+                            <option value="left">Gauche</option>
+                            <option value="center" selected>Centre</option>
+                            <option value="right">Droite</option>
+                        </select>
+                        <select id="iconVPos">
+                            <option value="top">Haut</option>
+                            <option value="mid" selected>Milieu</option>
+                            <option value="bottom">Bas</option>
+                        </select>
                     </div>
                 </div>
             </div>
@@ -270,6 +314,7 @@
             <button class="btn-download-all" onclick="downloadAll()">Telecharger toutes les images (.zip)</button>
         </div>
     </div>
+    <i id="icon-proxy" class="" style="position: absolute; left: -9999px; visibility: hidden;"></i>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script>
@@ -285,6 +330,14 @@
 
         let currentType = 'semaine';
         let tilesList = [];
+        
+        // Icon state
+        let iconClass = '';
+        let iconColor = '#ffffff';
+        let iconSize = 80;
+        let iconOpacity = 1;
+        let iconHPos = 'center';
+        let iconVPos = 'mid';
 
         const colorSchemes = {
             semaine: [
@@ -326,6 +379,47 @@
         document.getElementById('color1').addEventListener('input', updatePreview);
         document.getElementById('color2').addEventListener('input', updatePreview);
         document.getElementById('useCustomColors').addEventListener('change', updatePreview);
+
+        // Icon event listeners
+        document.getElementById('iconClass').addEventListener('input', (e) => {
+            iconClass = e.target.value.trim();
+            updatePreview();
+        });
+        document.getElementById('iconColor').addEventListener('input', (e) => {
+            iconColor = e.target.value;
+            updatePreview();
+        });
+        document.getElementById('iconOpacity').addEventListener('input', (e) => {
+            iconOpacity = e.target.value / 100;
+            document.getElementById('iconOpacityValue').textContent = e.target.value + '%';
+            updatePreview();
+        });
+        document.getElementById('iconSize').addEventListener('input', (e) => {
+            iconSize = parseInt(e.target.value);
+            document.getElementById('iconSizeValue').textContent = e.target.value + 'px';
+            updatePreview();
+        });
+        document.getElementById('iconHPos').addEventListener('change', (e) => {
+            iconHPos = e.target.value;
+            updatePreview();
+        });
+        document.getElementById('iconVPos').addEventListener('change', (e) => {
+            iconVPos = e.target.value;
+            updatePreview();
+        });
+
+        function getIconInfo(className) {
+            if (!className) return null;
+            const tempEl = document.getElementById('icon-proxy');
+            tempEl.className = className;
+            const style = window.getComputedStyle(tempEl, '::before');
+            const content = style.getPropertyValue('content').replace(/['"]/g, '');
+            if (!content || content === 'none') return null;
+            
+            const fontFamily = window.getComputedStyle(tempEl).getPropertyValue('font-family');
+            const fontWeight = window.getComputedStyle(tempEl).getPropertyValue('font-weight');
+            return { char: content, family: fontFamily, weight: fontWeight };
+        }
 
         function hexToRgb(hex) {
             const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -524,11 +618,47 @@
             return schemes[colorIndex % schemes.length];
         }
 
-        function drawTile(ctx, title, subject, type, angle, colors = null) {
+        function drawTile(ctx, title, subject, type, angle, colors = null, icon = null, iSize = null, hPos = null, vPos = null, iColor = null, iOp = undefined) {
             const [color1, color2] = colors || getColors();
 
             drawGradient(ctx, WIDTH, HEIGHT, color1, color2, angle);
             drawDiagonalLines(ctx, WIDTH, HEIGHT);
+            
+            // Draw Icon
+            const info = getIconInfo(icon || iconClass);
+            if (info) {
+                const size = iSize || iconSize;
+                const h = hPos || iconHPos;
+                const v = vPos || iconVPos;
+                const color = iColor || iconColor;
+                const opacity = iOp !== undefined ? iOp : iconOpacity;
+
+                ctx.save();
+                ctx.globalAlpha = opacity;
+                ctx.fillStyle = color;
+                ctx.font = `${info.weight} ${size}px ${info.family}`;
+                ctx.textBaseline = 'middle';
+                ctx.textAlign = 'center';
+
+                let x = WIDTH / 2;
+                let y = HEIGHT / 2;
+
+                if (h === 'left') x = MARGIN_SIDE + size/2;
+                else if (h === 'right') x = WIDTH - MARGIN_SIDE - size/2;
+
+                if (v === 'top') y = size/2 + 10;
+                else if (v === 'bottom') y = HEIGHT - size/2 - 10;
+
+                // Add small shadow to icon for readability
+                ctx.shadowColor = 'rgba(0,0,0,0.3)';
+                ctx.shadowBlur = 4;
+                ctx.shadowOffsetX = 2;
+                ctx.shadowOffsetY = 2;
+
+                ctx.fillText(info.char, x, y);
+                ctx.restore();
+            }
+
             drawText(ctx, title, subject, WIDTH, HEIGHT);
         }
 
@@ -560,7 +690,13 @@
                 subject,
                 type: currentType,
                 angle,
-                colors: [...colors]
+                colors: [...colors],
+                icon: iconClass,
+                iconColor: iconColor,
+                iconSize: iconSize,
+                iconOpacity: iconOpacity,
+                iconHPos: iconHPos,
+                iconVPos: iconVPos
             };
 
             tilesList.push(tile);
@@ -585,7 +721,8 @@
                 miniCanvas.width = 300;
                 miniCanvas.height = 200;
                 const miniCtx = miniCanvas.getContext('2d');
-                drawTile(miniCtx, tile.title, tile.subject, tile.type, tile.angle, tile.colors);
+                drawTile(miniCtx, tile.title, tile.subject, tile.type, tile.angle, tile.colors, 
+                         tile.icon, tile.iconSize, tile.iconHPos, tile.iconVPos, tile.iconColor, tile.iconOpacity);
 
                 div.innerHTML = `
                     <div class="tile-info">
@@ -609,7 +746,8 @@
             tempCanvas.width = 300;
             tempCanvas.height = 200;
             const tempCtx = tempCanvas.getContext('2d');
-            drawTile(tempCtx, tile.title, tile.subject, tile.type, tile.angle, tile.colors);
+            drawTile(tempCtx, tile.title, tile.subject, tile.type, tile.angle, tile.colors,
+                     tile.icon, tile.iconSize, tile.iconHPos, tile.iconVPos, tile.iconColor, tile.iconOpacity);
 
             const link = document.createElement('a');
             link.download = tile.title.replace(/[^a-z0-9]/gi, '_') + '.png';
@@ -635,7 +773,8 @@
                 tempCanvas.width = 300;
                 tempCanvas.height = 200;
                 const tempCtx = tempCanvas.getContext('2d');
-                drawTile(tempCtx, tile.title, tile.subject, tile.type, tile.angle, tile.colors);
+                drawTile(tempCtx, tile.title, tile.subject, tile.type, tile.angle, tile.colors,
+                         tile.icon, tile.iconSize, tile.iconHPos, tile.iconVPos, tile.iconColor, tile.iconOpacity);
 
                 const dataUrl = tempCanvas.toDataURL('image/png');
                 const base64 = dataUrl.split(',')[1];
