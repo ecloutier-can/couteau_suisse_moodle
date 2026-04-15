@@ -543,8 +543,8 @@
             border-color: var(--primary);
             transform: translateY(-8px);
         }
-        .icon-box i { font-size: 2.2rem; color: var(--text-main); }
-        .icon-box span { font-size: 0.65rem; color: var(--text-dim); text-transform: uppercase; font-weight: 700; letter-spacing: 1px; }
+        .icon-box i { font-size: 2.2rem; color: #ffffff; text-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .icon-box span { font-size: 0.65rem; color: var(--text-main); text-transform: uppercase; font-weight: 700; letter-spacing: 1px; opacity: 0.7; }
 
         .empty-placeholder {
             display: flex;
@@ -648,7 +648,7 @@
                 <div class="form-group">
                     <label>Icône interactive</label>
                     <div style="display: flex; gap: 12px;">
-                        <input type="text" id="iconSearchInput" placeholder="Chercher une icône..." readonly style="cursor: pointer; flex: 1;" onclick="openIconModal()">
+                        <input type="text" id="iconSearchInput" placeholder="Chercher une icône (ex: book, star...)" style="cursor: text; flex: 1;">
                         <button class="btn-browse" onclick="openIconModal()">
                             <i class="fas fa-search"></i>
                         </button>
@@ -768,7 +768,7 @@
         let tilesList = [];
         
         // Icon state
-        let iconClass = 'fas fa-book';
+        let iconClass = 'fa-solid fa-book-open';
         let iconColor = '#ffffff';
         let iconSize = 80;
         let iconOpacity = 1;
@@ -890,14 +890,24 @@
 
         function getIconInfo(cls) {
             const p = document.getElementById('icon-proxy');
+            if (!p) return null;
             p.className = cls;
+            
+            // Force reflow/style calculation
+            void p.offsetWidth;
+            
             const style = window.getComputedStyle(p, '::before');
             const content = style.getPropertyValue('content').replace(/['"]/g, '');
-            if (!content || content === 'none') return null;
+            
+            if (!content || content === 'none' || content === 'normal') {
+                return null;
+            }
+            
+            const mainStyle = window.getComputedStyle(p);
             return { 
                 char: content, 
-                family: window.getComputedStyle(p).getPropertyValue('font-family').replace(/['"]/g, ''),
-                weight: window.getComputedStyle(p).getPropertyValue('font-weight')
+                family: mainStyle.getPropertyValue('font-family').replace(/['"]/g, ''),
+                weight: mainStyle.getPropertyValue('font-weight')
             };
         }
 
@@ -962,9 +972,10 @@
 
         function renderIconGrid(icons) {
             const grid = document.getElementById('iconGrid');
+            if (!grid) return;
             grid.innerHTML = '';
             
-            if (icons.length === 0) {
+            if (!icons || icons.length === 0) {
                 grid.innerHTML = `<div class="empty-placeholder" style="grid-column: 1/-1; padding: 40px;">
                     <i class="fas fa-search"></i>
                     <p>Aucune icône trouvée</p>
@@ -972,7 +983,8 @@
                 return;
             }
 
-            icons.slice(0, 400).forEach(icon => {
+            const fragment = document.createDocumentFragment();
+            icons.slice(0, 300).forEach(icon => {
                 const box = document.createElement('div');
                 box.className = 'icon-box';
                 box.innerHTML = `<i class="${icon.class}"></i><span>${icon.label}</span>`;
@@ -982,8 +994,9 @@
                     updatePreview();
                     closeIconModal();
                 };
-                grid.appendChild(box);
+                fragment.appendChild(box);
             });
+            grid.appendChild(fragment);
         }
 
         function filterModalIcons() {
@@ -1060,9 +1073,23 @@
         }
 
         // Init
-        setTimeout(() => {
-            updatePreview();
-        }, 500);
+        window.addEventListener('load', () => {
+            // Wait for fonts to be ready for accurate canvas drawing
+            if (document.fonts) {
+                document.fonts.ready.then(() => {
+                    updatePreview();
+                });
+            } else {
+                setTimeout(updatePreview, 800);
+            }
+        });
+
+        // Search in sidebar also opens modal if no exact match found
+        document.getElementById('iconSearchInput').addEventListener('focus', () => {
+            if (window.FA_FREE_ICONS && window.FA_FREE_ICONS.length > 0) {
+                // optional: show recent or common icons?
+            }
+        });
     </script>
 </body>
 </html>
