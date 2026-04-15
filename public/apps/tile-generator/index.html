@@ -757,7 +757,6 @@
 
     <i id="icon-proxy" class="" style="position: absolute; left: -9999px; visibility: hidden;"></i>
 
-    <script src="icons_data.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script>
         const canvas = document.getElementById('preview');
@@ -773,6 +772,7 @@
         let tilesList = [];
         
         // Icon state
+        let faIcons = null;
         let iconClass = 'fa-solid fa-book-open';
         let iconColor = '#ffffff';
         let iconSize = 80;
@@ -961,9 +961,37 @@
             });
         });
 
-        function openIconModal() { 
-            document.getElementById('iconModal').style.display = 'flex'; 
+        async function openIconModal() { 
+            const modal = document.getElementById('iconModal');
+            const grid = document.getElementById('iconGrid');
+            modal.style.display = 'flex'; 
             document.getElementById('modalSearch').value = '';
+            
+            if (!faIcons) {
+                grid.innerHTML = `<div class="empty-placeholder" style="grid-column: 1 / -1; padding: 80px 40px;">
+                    <i class="fas fa-circle-notch fa-spin" style="font-size: 3rem; color: var(--primary);"></i>
+                    <p style="margin-top: 20px; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; color: var(--text-dim);">Initialisation de la bibliothèque...</p>
+                </div>`;
+                
+                try {
+                    // Robust path detect: handle missing trailing slash and filenames
+                    let baseUrl = window.location.pathname;
+                    if (baseUrl.includes('.') || !baseUrl.endsWith('/')) {
+                        baseUrl = baseUrl.substring(0, baseUrl.lastIndexOf('/') + 1);
+                    }
+                    const response = await fetch(baseUrl + 'icons_data.json');
+                    if (!response.ok) throw new Error('Load failed');
+                    faIcons = await response.json();
+                } catch (e) {
+                    console.error("Icon load error:", e);
+                    grid.innerHTML = `<div class="empty-placeholder" style="grid-column: 1 / -1; padding: 80px 40px;">
+                        <i class="fas fa-exclamation-triangle" style="color: #c0392b;"></i>
+                        <p>Échec du chargement des icônes</p>
+                    </div>`;
+                    return;
+                }
+            }
+            
             setStyleFilter('all');
         }
         function closeIconModal() { document.getElementById('iconModal').style.display = 'none'; }
@@ -971,7 +999,11 @@
         document.getElementById('iconSearchInput').addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 const val = e.target.value.trim().toLowerCase();
-                const found = FA_FREE_ICONS.find(i => 
+                if (!faIcons) {
+                    openIconModal(); // Trigger load and open modal if data not ready
+                    return;
+                }
+                const found = faIcons.find(i => 
                     i.label.toLowerCase() === val || 
                     i.class.toLowerCase() === val ||
                     i.class.split(' ').pop().toLowerCase() === val ||
@@ -983,6 +1015,8 @@
                     updatePreview();
                     e.target.style.background = 'rgba(16, 185, 129, 0.1)';
                     setTimeout(() => e.target.style.background = '', 500);
+                } else {
+                    openIconModal(); // Show modal if no exact match
                 }
             }
         });
@@ -1017,8 +1051,9 @@
         }
 
         function filterModalIcons() {
+            if (!faIcons) return;
             const q = document.getElementById('modalSearch').value.toLowerCase();
-            const filtered = FA_FREE_ICONS.filter(i => 
+            const filtered = faIcons.filter(i => 
                 (modalStyleFilter === 'all' || i.style === modalStyleFilter) &&
                 (i.label.toLowerCase().includes(q) || i.search.some(s => s.toLowerCase().includes(q)))
             );
