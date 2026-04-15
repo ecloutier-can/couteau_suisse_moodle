@@ -934,8 +934,31 @@
             });
         });
 
-        function openIconModal() { document.getElementById('iconModal').style.display = 'flex'; renderIconGrid(FA_FREE_ICONS); }
+        function openIconModal() { 
+            document.getElementById('iconModal').style.display = 'flex'; 
+            document.getElementById('modalSearch').value = '';
+            setStyleFilter('all');
+        }
         function closeIconModal() { document.getElementById('iconModal').style.display = 'none'; }
+
+        document.getElementById('iconSearchInput').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                const val = e.target.value.trim().toLowerCase();
+                const found = FA_FREE_ICONS.find(i => 
+                    i.label.toLowerCase() === val || 
+                    i.class.toLowerCase() === val ||
+                    i.class.split(' ').pop().toLowerCase() === val ||
+                    i.class.split(' ').pop().replace('fa-', '').toLowerCase() === val
+                );
+                if (found) {
+                    iconClass = found.class;
+                    e.target.value = found.label;
+                    updatePreview();
+                    e.target.style.background = 'rgba(16, 185, 129, 0.1)';
+                    setTimeout(() => e.target.style.background = '', 500);
+                }
+            }
+        });
 
         function renderIconGrid(icons) {
             const grid = document.getElementById('iconGrid');
@@ -975,6 +998,7 @@
         function setStyleFilter(s) {
             modalStyleFilter = s;
             document.querySelectorAll('.chip').forEach(c => c.classList.toggle('active', c.dataset.style === s));
+            document.getElementById('modalSearch').value = '';
             filterModalIcons();
         }
 
