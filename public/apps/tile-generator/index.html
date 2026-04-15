@@ -3,432 +3,683 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Générateur de Tuiles Moodle</title>
+    <title>Générateur de Tuiles Premium | POP</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary: #f6921e;
+            --primary-hover: #e07f0d;
+            --bg-dark: #0a0a0f;
+            --sidebar-bg: rgba(18, 18, 26, 0.9);
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --border: rgba(255, 255, 255, 0.08);
+            --text-main: #e2e2e7;
+            --text-dim: #9494a3;
+            --accent-glow: rgba(246, 146, 30, 0.15);
+        }
+
         * {
             box-sizing: border-box;
-            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary) transparent;
         }
+
+        *::-webkit-scrollbar {
+            width: 4px;
+        }
+        *::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        *::-webkit-scrollbar-thumb {
+            background-color: var(--primary);
+            border-radius: 20px;
+        }
+
         body {
-            background: #1a1a2e;
-            color: #eee;
-            padding: 20px;
-            min-height: 100vh;
-        }
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-        }
-        h1 {
-            text-align: center;
-            color: #fff;
-            margin-bottom: 30px;
-        }
-        .main-layout {
+            background: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            height: 100vh;
+            overflow: hidden;
             display: flex;
-            gap: 30px;
-            flex-wrap: wrap;
         }
-        .form-section {
+
+        .app-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        aside {
+            width: 400px;
+            background: var(--sidebar-bg);
+            backdrop-filter: blur(40px);
+            -webkit-backdrop-filter: blur(40px);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            z-index: 10;
+        }
+
+        .sidebar-header {
+            padding: 24px 32px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .sidebar-header h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: var(--primary);
+            font-weight: 900;
+        }
+
+        .sidebar-content {
             flex: 1;
-            min-width: 300px;
+            overflow-y: auto;
+            padding: 32px;
         }
-        .preview-section {
+
+        .section-title {
+            font-size: 0.7rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2.5px;
+            color: var(--text-dim);
+            margin: 32px 0 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .section-title:first-child { margin-top: 0; }
+        .section-title::after {
+            content: '';
             flex: 1;
-            min-width: 320px;
+            height: 1px;
+            background: linear-gradient(to right, var(--border), transparent);
         }
+
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 24px;
         }
+
         label {
             display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #ccc;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 8px;
+            opacity: 0.8;
         }
+
         input, select, textarea {
             width: 100%;
-            padding: 10px;
-            border: 1px solid #444;
-            border-radius: 5px;
-            background: #2a2a4a;
-            color: #fff;
-            font-size: 14px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 14px 18px;
+            color: white;
+            font-family: inherit;
+            font-size: 0.9rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
+
         input:focus, select:focus, textarea:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--accent-glow);
+            background: rgba(0, 0, 0, 0.6);
         }
-        textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
-        .type-buttons {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        .type-btn {
-            flex: 1;
-            min-width: 80px;
-            padding: 12px 15px;
-            border: 2px solid #444;
-            border-radius: 8px;
-            background: #2a2a4a;
-            color: #fff;
-            cursor: pointer;
-            text-align: center;
-            transition: all 0.2s;
-        }
-        .type-btn:hover {
-            border-color: #667eea;
-        }
-        .type-btn.active {
-            border-color: #667eea;
-            background: #3a3a6a;
-        }
-        .type-btn.semaine.active { border-color: #2980b9; background: #2980b9; }
-        .type-btn.test.active { border-color: #c0392b; background: #c0392b; }
-        .type-btn.pratique.active { border-color: #e67e22; background: #e67e22; }
-        .type-btn.examen.active { border-color: #8e44ad; background: #8e44ad; }
-        .type-btn.relache.active { border-color: #27ae60; background: #27ae60; }
 
-        .preview-box {
-            background: #2a2a4a;
-            border-radius: 10px;
-            padding: 20px;
+        .type-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .type-pill {
+            padding: 12px 6px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.02);
+            color: var(--text-dim);
+            font-size: 0.7rem;
+            font-weight: 700;
             text-align: center;
-        }
-        canvas {
-            border-radius: 5px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-        }
-        .btn-download {
-            display: inline-block;
-            margin-top: 15px;
-            padding: 12px 30px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
             cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .type-pill:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--text-dim);
+            color: white;
+        }
+
+        .type-pill.active {
+            color: white;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .type-pill.semaine.active { background: #2980b9; border-color: #2980b9; }
+        .type-pill.test.active { background: #c0392b; border-color: #c0392b; }
+        .type-pill.pratique.active { background: #e67e22; border-color: #e67e22; }
+        .type-pill.examen.active { background: #8e44ad; border-color: #8e44ad; }
+        .type-pill.relache.active { background: #27ae60; border-color: #27ae60; }
+        .type-pill.custom.active { background: var(--primary); border-color: var(--primary); }
+
+        .slider-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            height: 6px;
+            background: var(--border);
+            border-radius: 10px;
+            padding: 0;
+            border: none;
+            flex: 1;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border: 4px solid var(--primary);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(0,0,0,0.4);
             transition: transform 0.2s;
         }
-        .btn-download:hover {
+
+        .range-value {
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: var(--primary);
+            min-width: 45px;
+            text-align: right;
+            font-family: 'Orbitron', monospace;
+        }
+
+        .color-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .color-input-wrapper {
+            position: relative;
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            overflow: hidden;
+            border: 2px solid var(--border);
+            transition: all 0.3s;
+        }
+        .color-input-wrapper:hover {
+            border-color: var(--primary);
             transform: scale(1.05);
         }
-        .color-preview {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-top: 10px;
-        }
-        .angle-slider {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .angle-slider input[type="range"] {
-            flex: 1;
-        }
-        .angle-value {
-            min-width: 40px;
-            text-align: center;
+
+        input[type="color"] {
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            width: 80px;
+            height: 80px;
+            cursor: pointer;
+            border: none;
+            padding: 0;
         }
 
-        .tiles-list {
-            margin-top: 30px;
-            background: #2a2a4a;
-            border-radius: 10px;
-            padding: 20px;
-        }
-        .tiles-list h3 {
-            margin-top: 0;
-            color: #fff;
-        }
-        .tile-item {
+        .btn-browse {
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 0 18px;
+            font-weight: 800;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s;
             display: flex;
             align-items: center;
-            gap: 15px;
-            padding: 10px;
-            background: #1a1a2e;
-            border-radius: 8px;
-            margin-bottom: 10px;
+            justify-content: center;
         }
-        .tile-item canvas {
-            width: 150px;
-            height: 100px;
+        .btn-browse:hover {
+            background: var(--primary-hover);
+            box-shadow: 0 4px 15px var(--accent-glow);
         }
-        .tile-info {
+
+        main {
             flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: radial-gradient(circle at 50% 50%, #1a1a2e 0%, #0a0a0f 100%);
+            position: relative;
+            z-index: 1;
         }
-        .tile-actions button {
-            padding: 8px 15px;
-            margin: 2px;
-            border: none;
-            border-radius: 5px;
+
+        main::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: url("https://www.transparenttextures.com/patterns/carbon-fibre.png");
+            opacity: 0.03;
+            pointer-events: none;
+        }
+
+        .preview-area {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 60px;
+        }
+
+        .canvas-container {
+            position: relative;
+            padding: 20px;
+            background: rgba(255,255,255,0.02);
+            border-radius: 40px;
+            border: 1px solid var(--border);
+            box-shadow: 0 40px 80px rgba(0,0,0,0.5);
+        }
+
+        canvas#preview {
+            border-radius: 24px;
+            display: block;
+            max-width: 100%;
+            height: auto;
+            background: #000;
+        }
+
+        .canvas-controls {
+            position: absolute;
+            bottom: -80px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .btn-premium {
+            padding: 16px 32px;
+            border-radius: 18px;
+            font-weight: 800;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
             cursor: pointer;
-            font-size: 12px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: none;
+            font-family: 'Outfit', sans-serif;
         }
-        .btn-dl { background: #27ae60; color: #fff; }
-        .btn-del { background: #c0392b; color: #fff; }
-        .btn-add {
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 10px 20px rgba(246, 146, 30, 0.2);
+        }
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 15px 30px rgba(246, 146, 30, 0.4);
+        }
+
+        .btn-outline {
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+            border: 1px solid var(--border);
+            backdrop-filter: blur(10px);
+        }
+        .btn-outline:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-5px);
+        }
+
+        .gallery-area {
+            height: 280px;
+            background: rgba(18, 18, 26, 0.6);
+            backdrop-filter: blur(30px);
+            border-top: 1px solid var(--border);
+            padding: 32px 48px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .gallery-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .gallery-header h3 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            letter-spacing: 2px;
+        }
+
+        .gallery-scroll {
+            display: flex;
+            gap: 24px;
+            overflow-x: auto;
+            padding-bottom: 20px;
+            flex: 1;
+            scroll-behavior: smooth;
+        }
+
+        .gallery-item {
+            min-width: 220px;
+            height: 147px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+            transition: all 0.4s;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .gallery-item:hover {
+            border-color: var(--primary);
+            transform: translateY(-8px) scale(1.05);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+
+        .gallery-item img {
             width: 100%;
-            padding: 15px;
-            background: #3a3a6a;
-            border: 2px dashed #667eea;
-            border-radius: 8px;
-            color: #667eea;
-            font-size: 16px;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .item-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent 60%);
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding-bottom: 12px;
+            gap: 12px;
+            opacity: 0;
+            transition: all 0.3s;
+        }
+
+        .gallery-item:hover .item-overlay {
+            opacity: 1;
+        }
+
+        .icon-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            color: white;
             cursor: pointer;
             transition: all 0.2s;
+            font-size: 0.9rem;
         }
-        .btn-add:hover {
-            background: #4a4a7a;
-        }
-        .btn-download-all {
-            width: 100%;
-            margin-top: 15px;
-            padding: 15px;
-            background: linear-gradient(135deg, #27ae60, #2ecc71);
-            border: none;
-            border-radius: 8px;
-            color: #fff;
-            font-size: 16px;
-            cursor: pointer;
-        }
-        .info-text {
-            font-size: 12px;
-            color: #888;
-            margin-top: 5px;
-        }
+        .icon-btn:hover { transform: scale(1.2); }
+        .icon-btn.download { background: #27ae60; }
+        .icon-btn.delete { background: #c0392b; }
 
-        /* Modal d'icônes */
         .modal {
             display: none;
             position: fixed;
-            z-index: 2000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.8);
-            backdrop-filter: blur(5px);
+            inset: 0;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 60px;
         }
-        .modal-content {
-            background-color: #1a1a2e;
-            margin: 5% auto;
-            padding: 25px;
-            border: 1px solid #444;
-            width: 90%;
-            max-width: 1000px;
-            max-height: 85vh;
-            border-radius: 12px;
+
+        .modal-container {
+            background: #12121e;
+            width: 100%;
+            max-width: 1100px;
+            height: 100%;
+            border-radius: 32px;
+            border: 1px solid var(--border);
             display: flex;
             flex-direction: column;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        .modal-header h2 { margin: 0; color: #fff; }
-        .close-modal {
-            color: #aaa;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .close-modal:hover { color: #fff; }
-        
-        .modal-body {
-            overflow-y: auto;
-            flex-grow: 1;
-            padding-right: 10px;
-        }
-        .modal-filters {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-        .modal-filters input { flex: 1; min-width: 200px; }
-        .style-filters { display: flex; gap: 5px; }
-        .style-btn {
-            padding: 8px 15px;
-            background: #2a2a4a;
-            border: 1px solid #444;
-            color: #ccc;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 13px;
-        }
-        .style-btn.active {
-            background: #667eea;
-            color: #fff;
-            border-color: #667eea;
-        }
-        
-        .icon-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-            gap: 15px;
-        }
-        .icon-card {
-            background: #2a2a4a;
-            padding: 15px;
-            border-radius: 8px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s;
-            border: 1px solid transparent;
-        }
-        .icon-card:hover {
-            background: #3a3a6a;
-            border-color: #667eea;
-            transform: translateY(-2px);
-        }
-        .icon-card i {
-            display: block;
-            font-size: 28px;
-            margin-bottom: 10px;
-        }
-        .icon-card span {
-            font-size: 11px;
-            display: block;
             overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            color: #aaa;
+            box-shadow: 0 60px 120px rgba(0,0,0,0.8);
         }
-        
-        /* Sélecteur d'opacité large */
-        .wide-slider-container {
-            width: 100%;
-            margin-bottom: 20px;
-        }
-        .wide-slider-container input[type="range"] {
-            width: 100%;
-            height: 8px;
-            background: #2a2a4a;
-            border-radius: 5px;
-            outline: none;
-            -webkit-appearance: none;
-            margin: 15px 0;
-        }
-        .wide-slider-container input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 24px;
-            height: 24px;
-            background: #667eea;
-            border-radius: 50%;
-            cursor: pointer;
-            box-shadow: 0 0 10px rgba(102, 126, 234, 0.5);
-        }
-        .opacity-header {
+
+        .modal-header {
+            padding: 32px 48px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border-bottom: 1px solid var(--border);
         }
-        .opacity-header span { font-weight: bold; color: #667eea; font-size: 1.3em; }
+
+        .modal-header h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
+            color: white;
+            letter-spacing: 2px;
+        }
+
+        .modal-close {
+            background: rgba(255,255,255,0.05);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid var(--border);
+            color: white;
+        }
+        .modal-close:hover {
+            background: #c0392b;
+            border-color: #c0392b;
+        }
+
+        .modal-search {
+            padding: 24px 48px;
+            display: flex;
+            gap: 20px;
+            background: rgba(255,255,255,0.02);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .icon-grid {
+            flex: 1;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 20px;
+            padding: 40px 48px;
+            overflow-y: auto;
+        }
+
+        .icon-box {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .icon-box:hover {
+            background: rgba(246, 146, 30, 0.05);
+            border-color: var(--primary);
+            transform: translateY(-8px);
+        }
+        .icon-box i { font-size: 2.2rem; color: var(--text-main); }
+        .icon-box span { font-size: 0.65rem; color: var(--text-dim); text-transform: uppercase; font-weight: 700; letter-spacing: 1px; }
+
+        .empty-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            color: var(--border);
+            gap: 16px;
+        }
+        .empty-placeholder i { font-size: 3rem; }
+
+        .chip-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chip {
+            padding: 10px 20px;
+            border-radius: 30px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: var(--text-dim);
+            text-transform: uppercase;
+        }
+        .chip.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Generateur de Tuiles Moodle</h1>
-
-        <div class="main-layout">
-            <div class="form-section">
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside>
+            <div class="sidebar-header">
+                <i class="fas fa-magic" style="color: var(--primary); font-size: 1.4rem;"></i>
+                <h1>POPTiles</h1>
+            </div>
+            
+            <div class="sidebar-content">
+                <div class="section-title">Concept & Sujet</div>
+                
                 <div class="form-group">
-                    <label>Type de section</label>
-                    <div class="type-buttons">
-                        <div class="type-btn semaine active" data-type="semaine">Semaine</div>
-                        <div class="type-btn test" data-type="test">Test</div>
-                        <div class="type-btn pratique" data-type="pratique">Pratique</div>
-                        <div class="type-btn examen" data-type="examen">Examen</div>
-                        <div class="type-btn relache" data-type="relache">Relache</div>
+                    <label>Modèle de section</label>
+                    <div class="type-grid">
+                        <div class="type-pill semaine active" data-type="semaine">Semaine</div>
+                        <div class="type-pill test" data-type="test">Test</div>
+                        <div class="type-pill pratique" data-type="pratique">Pratique</div>
+                        <div class="type-pill examen" data-type="examen">Examen</div>
+                        <div class="type-pill relache" data-type="relache">Relâche</div>
+                        <div class="type-pill custom" data-type="custom">Custom</div>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label for="title">Titre (haut gauche)</label>
-                    <input type="text" id="title" placeholder="Ex: Semaine 1, Test #2 - 10%">
+                    <label for="title">Titre supérieur</label>
+                    <input type="text" id="title" placeholder="Ex: Semaine 1, Chapitre 3...">
                 </div>
 
                 <div class="form-group">
-                    <label for="subject">Sujet (centre) - utiliser Entree pour nouvelle ligne</label>
-                    <textarea id="subject" placeholder="Ex: Les antipsychotiques&#10;et anticonvulsivants"></textarea>
-                    <div class="info-text">Laissez vide pour n'afficher que le titre</div>
+                    <label for="subject">Sujet principal</label>
+                    <textarea id="subject" placeholder="Ex: Structure de la cellule&#10;et organites" rows="3"></textarea>
                 </div>
 
+                <div class="section-title">Atmosphère & Styles</div>
+
                 <div class="form-group">
-                    <label>Angle du degrade</label>
-                    <div class="angle-slider">
+                    <label>Orientation du dégradé</label>
+                    <div class="slider-wrapper">
                         <input type="range" id="angle" min="0" max="180" value="45">
-                        <span class="angle-value" id="angleValue">45°</span>
+                        <span class="range-value" id="angleValue">45°</span>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label>Couleurs personnalisées (optionnel)</label>
-                    <div class="color-preview">
-                        <input type="color" id="color1" value="#2980b9">
-                        <span>→</span>
-                        <input type="color" id="color2" value="#8e44ad">
-                        <label style="display: inline; margin-left: 10px;">
-                            <input type="checkbox" id="useCustomColors"> Utiliser
+                    <label>Palette de couleurs</label>
+                    <div class="color-row">
+                        <div class="color-input-wrapper"><input type="color" id="color1" value="#2980b9"></div>
+                        <i class="fas fa-bolt-lightning" style="font-size: 0.8rem; color: var(--primary); opacity: 0.5;"></i>
+                        <div class="color-input-wrapper"><input type="color" id="color2" value="#8e44ad"></div>
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; margin-left: auto;">
+                            <input type="checkbox" id="useCustomColors" style="width: 16px; height: 16px;">
+                            <span style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase;">Libre</span>
                         </label>
                     </div>
                 </div>
-                <div style="border-top: 1px solid #444; margin: 20px 0; padding-top: 20px;">
-                    <label style="color: #667eea; text-transform: uppercase; font-size: 12px; letter-spacing: 1px;">Configuration de l'icône</label>
+
+                <div class="section-title">Signature Visuelle</div>
+
+                <div class="form-group">
+                    <label>Icône interactive</label>
+                    <div style="display: flex; gap: 12px;">
+                        <input type="text" id="iconSearchInput" placeholder="Chercher une icône..." readonly style="cursor: pointer; flex: 1;" onclick="openIconModal()">
+                        <button class="btn-browse" onclick="openIconModal()">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                    <input type="hidden" id="iconClass" value="fas fa-book">
                 </div>
 
                 <div class="form-group">
-                    <label for="iconClass">Icône Font Awesome 6</label>
-                    <div class="dropdown-container" style="position: relative;">
-                        <div style="display: flex; gap: 10px;">
-                            <input type="text" id="iconSearch" placeholder="Recherche rapide..." autocomplete="off">
-                            <button class="btn-step" style="white-space: nowrap; padding: 0 15px;" onclick="openIconModal()">Parcourir</button>
+                    <label>Teinte & Transparence</label>
+                    <div style="display: flex; gap: 16px; align-items: center; margin-bottom: 20px;">
+                        <div class="color-input-wrapper"><input type="color" id="iconColor" value="#ffffff"></div>
+                        <div class="slider-wrapper" style="flex: 1;">
+                            <input type="range" id="iconOpacity" min="0" max="100" value="100">
+                            <span class="range-value" id="iconOpacityValue">1.0</span>
                         </div>
-                        <div id="iconDropdown" class="dropdown-results" style="position: absolute; top: 100%; left: 0; right: 0; background: #2a2a4a; border: 1px solid #444; max-height: 250px; overflow-y: auto; z-index: 1000; display: none;"></div>
-                    </div>
-                    <input type="hidden" id="iconClass">
-                    <div class="info-text">Tapez un mot-clé ou parcourez la bibliothèque complète (+2000 icônes)</div>
-                </div>
-
-                <div class="form-group">
-                    <label>Couleur de l'icône</label>
-                    <div class="color-preview">
-                        <input type="color" id="iconColor" value="#ffffff" style="width: 100%;">
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label>Opacité de l'icône</label>
-                    <div class="wide-slider-container">
-                        <div class="opacity-header">
-                            <span id="iconOpacityValue">100%</span>
-                        </div>
-                        <input type="range" id="iconOpacity" min="0" max="100" value="100">
+                    <label>Échelle de l'icône</label>
+                    <div class="slider-wrapper">
+                        <i class="fas fa-minus" style="font-size: 0.7rem; color: var(--text-dim);"></i>
+                        <input type="range" id="iconSize" min="10" max="400" value="80">
+                        <i class="fas fa-plus" style="font-size: 0.7rem; color: var(--text-dim);"></i>
+                        <span class="range-value" id="iconSizeValue">80px</span>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label>Taille de l'icône</label>
-                    <div class="angle-slider">
-                        <input type="range" id="iconSize" min="10" max="250" value="80">
-                        <span class="angle-value" id="iconSizeValue">80px</span>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label>Position de l'icône</label>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <label>Point d'ancrage</label>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
                         <select id="iconHPos">
                             <option value="left">Gauche</option>
                             <option value="center" selected>Centre</option>
@@ -442,48 +693,64 @@
                     </div>
                 </div>
             </div>
+        </aside>
 
-            <div class="preview-section">
-                <div class="preview-box">
+        <!-- Main Content -->
+        <main>
+            <div class="preview-area">
+                <div class="canvas-container">
                     <canvas id="preview" width="300" height="200"></canvas>
-                    <br>
-                    <button class="btn-download" onclick="downloadCurrent()">Telecharger cette image</button>
+                    <div class="canvas-controls">
+                        <button class="btn-premium btn-outline" onclick="downloadCurrent()">
+                            <i class="fas fa-cloud-arrow-down"></i> Prévisualiser
+                        </button>
+                        <button class="btn-premium btn-primary" onclick="addToList()">
+                            <i class="fas fa-folder-plus"></i> Collectionner
+                        </button>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="tiles-list">
-            <h3>Liste des tuiles</h3>
-            <div id="tilesList"></div>
-            <button class="btn-add" onclick="addToList()">+ Ajouter a la liste</button>
-            <button class="btn-download-all" onclick="downloadAll()">Telecharger toutes les images (.zip)</button>
-        </div>
+            <div class="gallery-area">
+                <div class="gallery-header">
+                    <h3>Atelier de Collection</h3>
+                    <button class="btn-premium btn-outline" style="padding: 10px 24px; font-size: 0.75rem; border-radius: 12px;" onclick="downloadAll()">
+                        <i class="fas fa-archive"></i> Pack ZIP Complet
+                    </button>
+                </div>
+                <div class="gallery-scroll" id="tilesList">
+                    <div class="empty-placeholder">
+                        <i class="fas fa-meteor"></i>
+                        <p style="font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Aucune tuile générée pour le moment</p>
+                    </div>
+                </div>
+            </div>
+        </main>
     </div>
-    <i id="icon-proxy" class="" style="position: absolute; left: -9999px; visibility: hidden;"></i>
 
     <!-- Modal d'icônes -->
     <div id="iconModal" class="modal">
-        <div class="modal-content">
+        <div class="modal-container">
             <div class="modal-header">
-                <h2>Bibliothèque d'icônes</h2>
-                <span class="close-modal" onclick="closeIconModal()">&times;</span>
+                <h2>Bibliothèque d'icônes Intelligente</h2>
+                <div class="modal-close" onclick="closeIconModal()"><i class="fas fa-times"></i></div>
             </div>
-            <div class="modal-filters">
-                <input type="text" id="modalSearch" placeholder="Rechercher par nom ou tag (ex: car, music, home...)" oninput="filterModalIcons()">
-                <div class="style-filters">
-                    <button class="style-btn active" data-style="all" onclick="setStyleFilter('all')">Tous</button>
-                    <button class="style-btn" data-style="solid" onclick="setStyleFilter('solid')">Solid</button>
-                    <button class="style-btn" data-style="regular" onclick="setStyleFilter('regular')">Regular</button>
-                    <button class="style-btn" data-style="brands" onclick="setStyleFilter('brands')">Brands</button>
+            <div class="modal-search">
+                <input type="text" id="modalSearch" placeholder="Rechercher par tag (ex: atom, music, globe...)" oninput="filterModalIcons()" style="flex: 1;">
+                <div class="chip-group">
+                    <div class="chip active" data-style="all" onclick="setStyleFilter('all')">Tous</div>
+                    <div class="chip" data-style="solid" onclick="setStyleFilter('solid')">Solid</div>
+                    <div class="chip" data-style="regular" onclick="setStyleFilter('regular')">Regular</div>
+                    <div class="chip" data-style="brands" onclick="setStyleFilter('brands')">Brands</div>
                 </div>
             </div>
-            <div class="modal-body">
-                <div id="iconGrid" class="icon-grid">
-                    <!-- Les icônes seront générées ici -->
-                </div>
+            <div id="iconGrid" class="icon-grid">
+                <!-- Icons generated here -->
             </div>
         </div>
     </div>
+
+    <i id="icon-proxy" class="" style="position: absolute; left: -9999px; visibility: hidden;"></i>
 
     <script src="icons_data.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -493,16 +760,15 @@
 
         const WIDTH = 300;
         const HEIGHT = 200;
-        const MARGIN_SIDE = 20;
-        const TOP_ZONE = 50;
-        const BOTTOM_ZONE = 50;
-        const CENTER_ZONE = 100;
+        const MARGIN_SIDE = 25;
+        const TOP_ZONE = 55;
+        const CENTER_ZONE = 90;
 
         let currentType = 'semaine';
         let tilesList = [];
         
         // Icon state
-        let iconClass = '';
+        let iconClass = 'fas fa-book';
         let iconColor = '#ffffff';
         let iconSize = 80;
         let iconOpacity = 1;
@@ -511,204 +777,78 @@
 
         const colorSchemes = {
             semaine: [
-                ['#2980b9', '#8e44ad'],
-                ['#2ecc71', '#27ae60'],
-                ['#3498db', '#2980b9'],
-                ['#9b59b6', '#8e44ad'],
-                ['#1abc9c', '#16a085'],
-                ['#34495e', '#2c3e50'],
-                ['#2980b9', '#27ae60'],
-                ['#8e44ad', '#c0392b'],
-                ['#16a085', '#2980b9'],
-                ['#27ae60', '#8e44ad'],
+                ['#2980b9', '#8e44ad'], ['#2ecc71', '#27ae60'], ['#3498db', '#2980b9'],
+                ['#9b59b6', '#8e44ad'], ['#1abc9c', '#16a085'], ['#34495e', '#2c3e50']
             ],
             test: [['#e74c3c', '#c0392b']],
             pratique: [['#f39c12', '#e67e22']],
             examen: [['#c0392b', '#8e44ad']],
-            relache: [['#2ecc71', '#1abc9c']]
+            relache: [['#2ecc71', '#1abc9c']],
+            custom: [['#f6921e', '#1a1a2e']]
         };
 
         let colorIndex = 0;
         let modalStyleFilter = 'all';
 
-        // Logique de la bibliothèque d'icônes
-        function openIconModal() {
-            document.getElementById('iconModal').style.display = 'block';
-            renderIconGrid(FA_FREE_ICONS);
-        }
+        // --- Core Functions ---
 
-        function closeIconModal() {
-            document.getElementById('iconModal').style.display = 'none';
-        }
-
-        function setStyleFilter(style) {
-            modalStyleFilter = style;
-            document.querySelectorAll('.style-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.style === style);
-            });
-            filterModalIcons();
-        }
-
-        function filterModalIcons() {
-            const query = document.getElementById('modalSearch').value.toLowerCase();
-            const filtered = FA_FREE_ICONS.filter(icon => {
-                const matchesStyle = modalStyleFilter === 'all' || icon.style === modalStyleFilter;
-                const matchesSearch = !query || 
-                                     icon.id.includes(query) || 
-                                     icon.label.toLowerCase().includes(query) || 
-                                     icon.search.some(s => s.toLowerCase().includes(query));
-                return matchesStyle && matchesSearch;
-            });
-            renderIconGrid(filtered);
-        }
-
-        function renderIconGrid(icons) {
-            const grid = document.getElementById('iconGrid');
-            grid.innerHTML = '';
-            const displayLimit = 300; // Limite pour fluidité DOM
-            const displayIcons = icons.slice(0, displayLimit); 
+        function updatePreview() {
+            // Draw Background
+            const c1 = document.getElementById('color1').value;
+            const c2 = document.getElementById('color2').value;
+            const angle = parseInt(document.getElementById('angle').value);
             
-            displayIcons.forEach(icon => {
-                const card = document.createElement('div');
-                card.className = 'icon-card';
-                card.innerHTML = `<i class="${icon.class}"></i><span>${icon.label}</span>`;
-                card.onclick = () => {
-                    selectIcon(icon.class, icon.label);
-                    closeIconModal();
-                };
-                grid.appendChild(card);
-            });
-            
-            if (icons.length > displayLimit) {
-                const more = document.createElement('div');
-                more.style.gridColumn = '1 / -1';
-                more.style.padding = '20px';
-                more.style.textAlign = 'center';
-                more.style.color = '#888';
-                more.textContent = `(+ ${icons.length - displayLimit} autres icônes - affinez la recherche)`;
-                grid.appendChild(more);
+            drawGradient(ctx, WIDTH, HEIGHT, c1, c2, angle);
+            drawDiagonalLines(ctx, WIDTH, HEIGHT, 25, 0.08);
+
+            // Draw Icon
+            const iconInfo = getIconInfo(iconClass);
+            if (iconInfo) {
+                ctx.save();
+                ctx.globalAlpha = iconOpacity;
+                ctx.fillStyle = iconColor;
+                ctx.font = `${iconInfo.weight} ${iconSize}px "${iconInfo.family}"`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+
+                let x = WIDTH / 2;
+                let y = HEIGHT / 2;
+
+                if (iconHPos === 'left') x = MARGIN_SIDE + iconSize/4;
+                if (iconHPos === 'right') x = WIDTH - MARGIN_SIDE - iconSize/4;
+                if (iconVPos === 'top') y = TOP_ZONE + iconSize/4;
+                if (iconVPos === 'bottom') y = HEIGHT - MARGIN_SIDE - iconSize/4;
+
+                // Add glass shadow to icon
+                ctx.shadowColor = 'rgba(0,0,0,0.3)';
+                ctx.shadowBlur = 15;
+                ctx.fillText(iconInfo.char, x, y);
+                ctx.restore();
             }
-        }
 
-        function selectIcon(cls, label) {
-            document.getElementById('iconClass').value = cls;
-            document.getElementById('iconSearch').value = label;
-            iconClass = cls;
-            updatePreview();
-        }
-
-        window.onclick = function(event) {
-            if (event.target == document.getElementById('iconModal')) closeIconModal();
-        }
-
-        function filterIcons(query) {
-            const q = query.toLowerCase();
-            const results = FA_FREE_ICONS.filter(icon => {
-                if (!q) return ['house', 'book', 'graduation-cap', 'pencil', 'user-graduate', 'flask', 'atom', 'calculator', 'gear'].includes(icon.id);
-                return icon.id.includes(q) || 
-                       icon.label.toLowerCase().includes(q) || 
-                       icon.search.some(s => s.toLowerCase().includes(q));
-            }).slice(0, 50);
-
-            renderDropdown(results);
-        }
-
-        function renderDropdown(icons) {
-            iconDropdown.innerHTML = '';
-            if (icons.length === 0) {
-                iconDropdown.innerHTML = '<div class="dropdown-item">Aucune icône trouvée</div>';
-            } else {
-                icons.forEach(icon => {
-                    const item = document.createElement('div');
-                    item.className = 'dropdown-item';
-                    item.innerHTML = `<i class="${icon.class}"></i> <span>${icon.label}</span>`;
-                    item.onclick = () => {
-                        selectIcon(icon.class, icon.label);
-                        iconDropdown.style.display = 'none';
-                    };
-                    iconDropdown.appendChild(item);
-                });
-            }
-            iconDropdown.style.display = 'block';
-        }
-
-        document.getElementById('iconColor').addEventListener('input', (e) => {
-            iconColor = e.target.value;
-            updatePreview();
-        });
-        document.getElementById('iconOpacity').addEventListener('input', (e) => {
-            let val = e.target.value;
-            iconOpacity = val / 100;
-            document.getElementById('iconOpacityValue').textContent = val + '%';
-            updatePreview();
-        });
-        document.getElementById('iconSize').addEventListener('input', (e) => {
-            iconSize = parseInt(e.target.value);
-            document.getElementById('iconSizeValue').textContent = e.target.value + 'px';
-            updatePreview();
-        });
-        document.getElementById('iconHPos').addEventListener('change', (e) => {
-            iconHPos = e.target.value;
-            updatePreview();
-        });
-        document.getElementById('iconVPos').addEventListener('change', (e) => {
-            iconVPos = e.target.value;
-            updatePreview();
-        });
-
-        function getIconInfo(className) {
-            if (!className) return null;
-            const tempEl = document.getElementById('icon-proxy');
-            tempEl.className = className;
-            const style = window.getComputedStyle(tempEl, '::before');
-            const content = style.getPropertyValue('content').replace(/['"]/g, '');
-            if (!content || content === 'none') return null;
-            
-            const fontFamily = window.getComputedStyle(tempEl).getPropertyValue('font-family');
-            const fontWeight = window.getComputedStyle(tempEl).getPropertyValue('font-weight');
-            return { char: content, family: fontFamily, weight: fontWeight };
-        }
-
-        function hexToRgb(hex) {
-            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-            return result ? {
-                r: parseInt(result[1], 16),
-                g: parseInt(result[2], 16),
-                b: parseInt(result[3], 16)
-            } : null;
+            // Draw Text
+            const title = document.getElementById('title').value;
+            const subject = document.getElementById('subject').value;
+            drawCustomText(ctx, title, subject, WIDTH, HEIGHT);
         }
 
         function drawGradient(ctx, width, height, color1, color2, angle) {
             const angleRad = angle * Math.PI / 180;
-            const cos = Math.cos(angleRad);
-            const sin = Math.sin(angleRad);
+            const x1 = width / 2 - Math.cos(angleRad) * width / 2;
+            const y1 = height / 2 - Math.sin(angleRad) * height / 2;
+            const x2 = width / 2 + Math.cos(angleRad) * width / 2;
+            const y2 = height / 2 + Math.sin(angleRad) * height / 2;
 
-            const c1 = hexToRgb(color1);
-            const c2 = hexToRgb(color2);
-
-            const imageData = ctx.createImageData(width, height);
-            const data = imageData.data;
-            const maxDist = Math.abs(width * cos) + Math.abs(height * sin);
-
-            for (let y = 0; y < height; y++) {
-                for (let x = 0; x < width; x++) {
-                    let dist = (x * cos + y * sin) / maxDist;
-                    dist = Math.max(0, Math.min(1, dist));
-
-                    const idx = (y * width + x) * 4;
-                    data[idx] = Math.round(c1.r + (c2.r - c1.r) * dist);
-                    data[idx + 1] = Math.round(c1.g + (c2.g - c1.g) * dist);
-                    data[idx + 2] = Math.round(c1.b + (c2.b - c1.b) * dist);
-                    data[idx + 3] = 255;
-                }
-            }
-            ctx.putImageData(imageData, 0, 0);
+            const grad = ctx.createLinearGradient(x1, y1, x2, y2);
+            grad.addColorStop(0, color1);
+            grad.addColorStop(1, color2);
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, width, height);
         }
 
-        function drawDiagonalLines(ctx, width, height, spacing = 25, opacity = 0.06) {
+        function drawDiagonalLines(ctx, width, height, spacing, opacity) {
             ctx.strokeStyle = `rgba(255, 255, 255, ${opacity})`;
-            ctx.lineWidth = 2;
-
+            ctx.lineWidth = 1;
             for (let i = -height; i < width + height; i += spacing) {
                 ctx.beginPath();
                 ctx.moveTo(i, 0);
@@ -717,329 +857,179 @@
             }
         }
 
-        // Fonction pour mesurer et adapter le texte
-        function fitText(ctx, text, maxWidth, maxFontSize, minFontSize) {
-            let fontSize = maxFontSize;
-            ctx.font = `bold ${fontSize}px Arial`;
-
-            while (ctx.measureText(text).width > maxWidth && fontSize > minFontSize) {
-                fontSize -= 1;
-                ctx.font = `bold ${fontSize}px Arial`;
+        function drawCustomText(ctx, title, subject, width, height) {
+            const maxW = width - (MARGIN_SIDE * 2);
+            
+            // Title
+            if (title) {
+                ctx.font = 'bold 18px "Inter", sans-serif';
+                ctx.fillStyle = 'white';
+                ctx.shadowColor = 'rgba(0,0,0,0.5)';
+                ctx.shadowBlur = 4;
+                ctx.fillText(title, MARGIN_SIDE, 35);
             }
 
-            return fontSize;
-        }
-
-        // Fonction pour wrapper le texte sur plusieurs lignes
-        function wrapText(ctx, text, maxWidth, fontSize) {
-            const words = text.split(' ');
-            const lines = [];
-            let currentLine = '';
-
-            ctx.font = `bold ${fontSize}px Arial`;
-
-            for (const word of words) {
-                const testLine = currentLine ? currentLine + ' ' + word : word;
-                if (ctx.measureText(testLine).width > maxWidth && currentLine) {
-                    lines.push(currentLine);
-                    currentLine = word;
-                } else {
-                    currentLine = testLine;
-                }
-            }
-            if (currentLine) {
-                lines.push(currentLine);
-            }
-
-            return lines;
-        }
-
-        function drawText(ctx, title, subject, width, height) {
-            const maxTextWidth = width - (MARGIN_SIDE * 2);
-
-            // === TITRE (zone 25% haut) ===
-            let titleFontSize = 20;
-            let titleLines = [title];
-
-            ctx.font = `bold ${titleFontSize}px Arial`;
-            let titleWidth = ctx.measureText(title).width;
-
-            if (titleWidth > maxTextWidth) {
-                // Reduire la taille
-                titleFontSize = fitText(ctx, title, maxTextWidth, 20, 12);
-                ctx.font = `bold ${titleFontSize}px Arial`;
-                titleWidth = ctx.measureText(title).width;
-
-                // Si encore trop long, wrapper
-                if (titleWidth > maxTextWidth) {
-                    titleLines = wrapText(ctx, title, maxTextWidth, titleFontSize);
-                }
-            }
-
-            // Centrer verticalement dans la zone du haut (0 - TOP_ZONE)
-            const titleLineHeight = titleFontSize * 1.2;
-            const titleTotalHeight = titleLines.length * titleLineHeight;
-            let titleStartY = (TOP_ZONE - titleTotalHeight) / 2 + titleFontSize;
-
-            titleLines.forEach((line, i) => {
-                const y = titleStartY + (i * titleLineHeight);
-                ctx.font = `bold ${titleFontSize}px Arial`;
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
-                ctx.fillText(line, MARGIN_SIDE + 2, y + 2);
-                ctx.fillStyle = '#ffffff';
-                ctx.fillText(line, MARGIN_SIDE, y);
-            });
-
-            // === SUJET (zone 50% centre) ===
+            // Subject (Multi-line)
             if (subject) {
-                let subjectLines = subject.split('\n');
-                let subjectFontSize = 28;
-                let allLines = [];
-                let needsResize = true;
-
-                // Boucle pour adapter la taille et wrapper
-                while (needsResize && subjectFontSize >= 12) {
-                    allLines = [];
-                    ctx.font = `bold ${subjectFontSize}px Arial`;
-
-                    for (const line of subjectLines) {
-                        const lineWidth = ctx.measureText(line).width;
-                        if (lineWidth > maxTextWidth) {
-                            // Verifier si c'est un seul mot
-                            if (line.indexOf(' ') === -1) {
-                                // Mot seul trop long - reduire la taille
-                                let wordFontSize = subjectFontSize;
-                                while (ctx.measureText(line).width > maxTextWidth && wordFontSize > 12) {
-                                    wordFontSize -= 2;
-                                    ctx.font = `bold ${wordFontSize}px Arial`;
-                                }
-                                if (wordFontSize < subjectFontSize) {
-                                    subjectFontSize = wordFontSize;
-                                    ctx.font = `bold ${subjectFontSize}px Arial`;
-                                }
-                                allLines.push(line);
-                            } else {
-                                allLines.push(...wrapText(ctx, line, maxTextWidth, subjectFontSize));
-                            }
-                        } else {
-                            allLines.push(line);
-                        }
-                    }
-
-                    const totalTextHeight = allLines.length * (subjectFontSize * 1.3);
-                    if (totalTextHeight <= CENTER_ZONE) {
-                        needsResize = false;
-                    } else {
-                        subjectFontSize -= 2;
-                    }
-                }
-
-                // Dessiner le sujet centre dans la zone du milieu
-                const lineHeight = subjectFontSize * 1.3;
-                const totalTextHeight = allLines.length * lineHeight;
-                const centerZoneStart = TOP_ZONE;
-                const startY = centerZoneStart + (CENTER_ZONE - totalTextHeight) / 2 + subjectFontSize;
-
-                ctx.font = `bold ${subjectFontSize}px Arial`;
-
-                allLines.forEach((line, i) => {
-                    const textWidth = ctx.measureText(line).width;
-                    const x = (width - textWidth) / 2;
-                    const y = startY + i * lineHeight;
-
-                    ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
-                    ctx.fillText(line, x + 2, y + 2);
-                    ctx.fillStyle = '#ffffff';
-                    ctx.fillText(line, x, y);
+                let fs = 26;
+                ctx.font = `800 ${fs}px "Outfit", sans-serif`;
+                const lines = subject.split('\n');
+                const lineHeight = fs * 1.1;
+                const totalH = lines.length * lineHeight;
+                
+                let startY = TOP_ZONE + (CENTER_ZONE - totalH)/2 + fs/2;
+                
+                lines.forEach((line, i) => {
+                    ctx.textAlign = 'center';
+                    ctx.fillText(line, width/2, startY + (i * lineHeight));
                 });
             }
+            // Reset shadows
+            ctx.shadowBlur = 0;
         }
 
-        function getColors() {
-            if (document.getElementById('useCustomColors').checked) {
-                return [
-                    document.getElementById('color1').value,
-                    document.getElementById('color2').value
-                ];
-            }
-            const schemes = colorSchemes[currentType];
-            return schemes[colorIndex % schemes.length];
+        function getIconInfo(cls) {
+            const p = document.getElementById('icon-proxy');
+            p.className = cls;
+            const style = window.getComputedStyle(p, '::before');
+            const content = style.getPropertyValue('content').replace(/['"]/g, '');
+            if (!content || content === 'none') return null;
+            return { 
+                char: content, 
+                family: window.getComputedStyle(p).getPropertyValue('font-family'),
+                weight: window.getComputedStyle(p).getPropertyValue('font-weight')
+            };
         }
 
-        function drawTile(ctx, title, subject, type, angle, colors = null, icon = null, iSize = null, hPos = null, vPos = null, iColor = null, iOp = undefined) {
-            const [color1, color2] = colors || getColors();
+        // --- Interaction Logic ---
 
-            drawGradient(ctx, WIDTH, HEIGHT, color1, color2, angle);
-            drawDiagonalLines(ctx, WIDTH, HEIGHT);
-            
-            // Draw Icon
-            const info = getIconInfo(icon || iconClass);
-            if (info) {
-                const size = iSize || iconSize;
-                const h = hPos || iconHPos;
-                const v = vPos || iconVPos;
-                const color = iColor || iconColor;
-                const opacity = iOp !== undefined ? iOp : iconOpacity;
+        document.querySelectorAll('.type-pill').forEach(pill => {
+            pill.onclick = () => {
+                document.querySelectorAll('.type-pill').forEach(p => p.classList.remove('active'));
+                pill.classList.add('active');
+                currentType = pill.dataset.type;
+                
+                if (currentType !== 'custom' && !document.getElementById('useCustomColors').checked) {
+                    const scheme = colorSchemes[currentType][0];
+                    document.getElementById('color1').value = scheme[0];
+                    document.getElementById('color2').value = scheme[1];
+                }
+                updatePreview();
+            };
+        });
 
-                ctx.save();
-                ctx.globalAlpha = opacity;
-                ctx.fillStyle = color;
-                ctx.font = `${info.weight} ${size}px ${info.family}`;
-                ctx.textBaseline = 'middle';
-                ctx.textAlign = 'center';
+        const inputs = ['title', 'subject', 'angle', 'color1', 'color2', 'iconColor', 'iconOpacity', 'iconSize', 'iconHPos', 'iconVPos'];
+        inputs.forEach(id => {
+            document.getElementById(id).addEventListener('input', () => {
+                if (id === 'angle') document.getElementById('angleValue').textContent = document.getElementById('angle').value + '°';
+                if (id === 'iconOpacity') {
+                    iconOpacity = document.getElementById('iconOpacity').value / 100;
+                    document.getElementById('iconOpacityValue').textContent = iconOpacity.toFixed(1);
+                }
+                if (id === 'iconSize') {
+                    iconSize = parseInt(document.getElementById('iconSize').value);
+                    document.getElementById('iconSizeValue').textContent = iconSize + 'px';
+                }
+                updatePreview();
+            });
+        });
 
-                let x = WIDTH / 2;
-                let y = HEIGHT / 2;
+        function openIconModal() { document.getElementById('iconModal').style.display = 'flex'; renderIconGrid(FA_FREE_ICONS); }
+        function closeIconModal() { document.getElementById('iconModal').style.display = 'none'; }
 
-                if (h === 'left') x = MARGIN_SIDE + size/2;
-                else if (h === 'right') x = WIDTH - MARGIN_SIDE - size/2;
-
-                if (v === 'top') y = size/2 + 10;
-                else if (v === 'bottom') y = HEIGHT - size/2 - 10;
-
-                // Add small shadow to icon for readability
-                // Ombre qui suit l'opacité de l'icône
-                ctx.shadowColor = `rgba(0,0,0,${0.3 * iconOpacity})`;
-                ctx.shadowBlur = 4;
-                ctx.shadowOffsetX = 2;
-                ctx.shadowOffsetY = 2;
-
-                ctx.fillText(info.char, x, y);
-                ctx.restore();
-            }
-
-            drawText(ctx, title, subject, WIDTH, HEIGHT);
+        function renderIconGrid(icons) {
+            const grid = document.getElementById('iconGrid');
+            grid.innerHTML = '';
+            icons.slice(0, 200).forEach(icon => {
+                const box = document.createElement('div');
+                box.className = 'icon-box';
+                box.innerHTML = `<i class="${icon.class}"></i><span>${icon.label}</span>`;
+                box.onclick = () => {
+                    iconClass = icon.class;
+                    document.getElementById('iconSearchInput').value = icon.label;
+                    updatePreview();
+                    closeIconModal();
+                };
+                grid.appendChild(box);
+            });
         }
 
-        function updatePreview() {
-            const title = document.getElementById('title').value || 'Titre';
-            const subject = document.getElementById('subject').value;
-            const angle = parseInt(document.getElementById('angle').value);
-
-            drawTile(ctx, title, subject, currentType, angle);
+        function filterModalIcons() {
+            const q = document.getElementById('modalSearch').value.toLowerCase();
+            const filtered = FA_FREE_ICONS.filter(i => 
+                (modalStyleFilter === 'all' || i.style === modalStyleFilter) &&
+                (i.label.toLowerCase().includes(q) || i.search.some(s => s.toLowerCase().includes(q)))
+            );
+            renderIconGrid(filtered);
         }
 
-        function downloadCurrent() {
-            const title = document.getElementById('title').value || 'tuile';
-            const link = document.createElement('a');
-            link.download = title.replace(/[^a-z0-9]/gi, '_') + '.png';
-            link.href = canvas.toDataURL('image/png');
-            link.click();
+        function setStyleFilter(s) {
+            modalStyleFilter = s;
+            document.querySelectorAll('.chip').forEach(c => c.classList.toggle('active', c.dataset.style === s));
+            filterModalIcons();
         }
 
         function addToList() {
-            const title = document.getElementById('title').value || 'Titre';
-            const subject = document.getElementById('subject').value;
-            const angle = parseInt(document.getElementById('angle').value);
-            const colors = getColors();
-
-            const tile = {
-                id: Date.now(),
-                title,
-                subject,
-                type: currentType,
-                angle,
-                colors: [...colors],
-                icon: iconClass,
-                iconColor: iconColor,
-                iconSize: iconSize,
-                iconOpacity: iconOpacity,
-                iconHPos: iconHPos,
-                iconVPos: iconVPos
-            };
-
-            tilesList.push(tile);
-            colorIndex++;
-            renderTilesList();
-
-            // Reset form
-            document.getElementById('title').value = '';
-            document.getElementById('subject').value = '';
-            updatePreview();
+            const dataUrl = canvas.toDataURL('image/png');
+            const id = Date.now();
+            tilesList.push({ id, dataUrl, name: `${document.getElementById('title').value || 'Tuile'}_${id}` });
+            renderGallery();
         }
 
-        function renderTilesList() {
+        function renderGallery() {
             const container = document.getElementById('tilesList');
+            if (tilesList.length === 0) {
+                container.innerHTML = '<div class="empty-placeholder"><i class="fas fa-meteor"></i><p>Collection vide</p></div>';
+                return;
+            }
             container.innerHTML = '';
-
-            tilesList.forEach((tile, index) => {
+            tilesList.forEach(item => {
                 const div = document.createElement('div');
-                div.className = 'tile-item';
-
-                const miniCanvas = document.createElement('canvas');
-                miniCanvas.width = 300;
-                miniCanvas.height = 200;
-                const miniCtx = miniCanvas.getContext('2d');
-                drawTile(miniCtx, tile.title, tile.subject, tile.type, tile.angle, tile.colors, 
-                         tile.icon, tile.iconSize, tile.iconHPos, tile.iconVPos, tile.iconColor, tile.iconOpacity);
-
+                div.className = 'gallery-item';
                 div.innerHTML = `
-                    <div class="tile-info">
-                        <strong>${tile.title}</strong><br>
-                        <small>${tile.subject.replace(/\n/g, ' | ') || '(pas de sujet)'}</small>
-                    </div>
-                    <div class="tile-actions">
-                        <button class="btn-dl" onclick="downloadTile(${index})">Telecharger</button>
-                        <button class="btn-del" onclick="deleteTile(${index})">Supprimer</button>
+                    <img src="${item.dataUrl}">
+                    <div class="item-overlay">
+                        <button class="icon-btn download" onclick="downloadItem('${item.dataUrl}', '${item.name}')"><i class="fas fa-download"></i></button>
+                        <button class="icon-btn delete" onclick="deleteItem(${item.id})"><i class="fas fa-trash"></i></button>
                     </div>
                 `;
-
-                div.insertBefore(miniCanvas, div.firstChild);
                 container.appendChild(div);
             });
         }
 
-        function downloadTile(index) {
-            const tile = tilesList[index];
-            const tempCanvas = document.createElement('canvas');
-            tempCanvas.width = 300;
-            tempCanvas.height = 200;
-            const tempCtx = tempCanvas.getContext('2d');
-            drawTile(tempCtx, tile.title, tile.subject, tile.type, tile.angle, tile.colors,
-                     tile.icon, tile.iconSize, tile.iconHPos, tile.iconVPos, tile.iconColor, tile.iconOpacity);
-
-            const link = document.createElement('a');
-            link.download = tile.title.replace(/[^a-z0-9]/gi, '_') + '.png';
-            link.href = tempCanvas.toDataURL('image/png');
-            link.click();
+        function deleteItem(id) {
+            tilesList = tilesList.filter(t => t.id !== id);
+            renderGallery();
         }
 
-        function deleteTile(index) {
-            tilesList.splice(index, 1);
-            renderTilesList();
+        function downloadItem(url, name) {
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = name + '.png';
+            a.click();
+        }
+
+        function downloadCurrent() {
+            downloadItem(canvas.toDataURL('image/png'), document.getElementById('title').value || 'tuile_pop');
         }
 
         async function downloadAll() {
-            if (tilesList.length === 0) {
-                alert('Ajoutez des tuiles a la liste d\'abord!');
-                return;
-            }
-
             const zip = new JSZip();
-
-            tilesList.forEach((tile, index) => {
-                const tempCanvas = document.createElement('canvas');
-                tempCanvas.width = 300;
-                tempCanvas.height = 200;
-                const tempCtx = tempCanvas.getContext('2d');
-                drawTile(tempCtx, tile.title, tile.subject, tile.type, tile.angle, tile.colors,
-                         tile.icon, tile.iconSize, tile.iconHPos, tile.iconVPos, tile.iconColor, tile.iconOpacity);
-
-                const dataUrl = tempCanvas.toDataURL('image/png');
-                const base64 = dataUrl.split(',')[1];
-                const filename = String(index + 1).padStart(2, '0') + '_' + tile.title.replace(/[^a-z0-9]/gi, '_') + '.png';
-                zip.file(filename, base64, {base64: true});
+            tilesList.forEach(t => {
+                const b64 = t.dataUrl.split(',')[1];
+                zip.file(t.name + ".png", b64, {base64: true});
             });
-
-            const blob = await zip.generateAsync({type: 'blob'});
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = 'tuiles_moodle.zip';
-            link.click();
+            const content = await zip.generateAsync({type:"blob"});
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(content);
+            a.download = "pop_collection.zip";
+            a.click();
         }
 
-        // Initial preview
-        updatePreview();
+        // Init
+        setTimeout(() => {
+            updatePreview();
+        }, 500);
     </script>
 </body>
 </html>

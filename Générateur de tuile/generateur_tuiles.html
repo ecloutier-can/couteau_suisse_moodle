@@ -533,7 +533,14 @@
 
         // Logique de la bibliothèque d'icônes
         function openIconModal() {
+            console.log("Opening icon modal...");
             document.getElementById('iconModal').style.display = 'block';
+            if (typeof FA_FREE_ICONS === 'undefined' || !window.FA_FREE_ICONS) {
+                console.error("FA_FREE_ICONS is not defined!");
+                const grid = document.getElementById('iconGrid');
+                grid.innerHTML = '<div style="grid-column: 1/-1; padding: 20px; text-align: center; color: #ff6b6b;"><i class="fa-solid fa-triangle-exclamation"></i><br>Erreur : Les icônes ne sont pas chargées.<br>Vérifiez le fichier icons_data.js.</div>';
+                return;
+            }
             renderIconGrid(FA_FREE_ICONS);
         }
 
@@ -551,6 +558,8 @@
 
         function filterModalIcons() {
             const query = document.getElementById('modalSearch').value.toLowerCase();
+            if (typeof FA_FREE_ICONS === 'undefined' || !window.FA_FREE_ICONS) return;
+            
             const filtered = FA_FREE_ICONS.filter(icon => {
                 const matchesStyle = modalStyleFilter === 'all' || icon.style === modalStyleFilter;
                 const matchesSearch = !query || 
@@ -603,6 +612,8 @@
 
         function filterIcons(query) {
             const q = query.toLowerCase();
+            if (typeof FA_FREE_ICONS === 'undefined' || !window.FA_FREE_ICONS) return;
+            
             const results = FA_FREE_ICONS.filter(icon => {
                 if (!q) return ['house', 'book', 'graduation-cap', 'pencil', 'user-graduate', 'flask', 'atom', 'calculator', 'gear'].includes(icon.id);
                 return icon.id.includes(q) || 
