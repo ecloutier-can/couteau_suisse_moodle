@@ -645,6 +645,11 @@
 
                 <div class="section-title">Signature Visuelle</div>
 
+                <div class="form-group" style="flex-direction: row; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.03); padding: 12px; border-radius: 12px; margin-bottom: 20px;">
+                    <label style="margin-bottom: 0; cursor: pointer;">Afficher l'icône</label>
+                    <input type="checkbox" id="showIcon" checked onchange="updatePreview()" style="width: 20px; height: 20px; accent-color: var(--primary); cursor: pointer;">
+                </div>
+
                 <div class="form-group">
                     <label>Icône interactive</label>
                     <div style="display: flex; gap: 12px;">
@@ -802,7 +807,9 @@
             drawDiagonalLines(ctx, WIDTH, HEIGHT, 25, 0.08);
 
             // Draw Icon
-            const iconInfo = getIconInfo(iconClass);
+            const showIcon = document.getElementById('showIcon').checked;
+            const iconInfo = showIcon ? getIconInfo(iconClass) : null;
+            
             if (iconInfo) {
                 ctx.save();
                 ctx.globalAlpha = iconOpacity;
@@ -928,18 +935,28 @@
             };
         });
 
-        const inputs = ['title', 'subject', 'angle', 'color1', 'color2', 'iconColor', 'iconOpacity', 'iconSize', 'iconHPos', 'iconVPos'];
-        inputs.forEach(id => {
-            document.getElementById(id).addEventListener('input', () => {
-                if (id === 'angle') document.getElementById('angleValue').textContent = document.getElementById('angle').value + '°';
+        const inputIds = ['title', 'subject', 'angle', 'color1', 'color2', 'iconColor', 'iconOpacity', 'iconSize', 'iconHPos', 'iconVPos'];
+        inputIds.forEach(id => {
+            const el = document.getElementById(id);
+            if (!el) return;
+            
+            el.addEventListener('input', () => {
+                const val = el.value;
+                if (id === 'angle') document.getElementById('angleValue').textContent = val + '°';
                 if (id === 'iconOpacity') {
-                    iconOpacity = document.getElementById('iconOpacity').value / 100;
+                    iconOpacity = val / 100;
                     document.getElementById('iconOpacityValue').textContent = iconOpacity.toFixed(1);
                 }
                 if (id === 'iconSize') {
-                    iconSize = parseInt(document.getElementById('iconSize').value);
+                    iconSize = parseInt(val);
                     document.getElementById('iconSizeValue').textContent = iconSize + 'px';
                 }
+                
+                // Sync global variables
+                if (id === 'iconColor') iconColor = val;
+                if (id === 'iconHPos') iconHPos = val;
+                if (id === 'iconVPos') iconVPos = val;
+                
                 updatePreview();
             });
         });
