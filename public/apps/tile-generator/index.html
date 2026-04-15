@@ -10,8 +10,8 @@
         :root {
             --primary: #f6921e;
             --primary-hover: #e07f0d;
-            --bg-dark: #0a0a0f;
-            --sidebar-bg: rgba(18, 18, 26, 0.9);
+            --bg-dark: #0f111a;
+            --sidebar-bg: rgba(15, 17, 26, 0.95);
             --card-bg: rgba(255, 255, 255, 0.03);
             --border: rgba(255, 255, 255, 0.08);
             --text-main: #e2e2e7;
@@ -177,7 +177,7 @@
         .type-pill.test.active { background: #c0392b; border-color: #c0392b; }
         .type-pill.pratique.active { background: #e67e22; border-color: #e67e22; }
         .type-pill.examen.active { background: #8e44ad; border-color: #8e44ad; }
-        .type-pill.relache.active { background: #27ae60; border-color: #27ae60; }
+        .type-pill.relache.active { background: #10b981; border-color: #10b981; }
         .type-pill.custom.active { background: var(--primary); border-color: var(--primary); }
 
         .slider-wrapper {
@@ -350,7 +350,7 @@
         .btn-outline {
             background: rgba(255, 255, 255, 0.05);
             color: white;
-            border: 1px solid var(--border);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             backdrop-filter: blur(10px);
         }
         .btn-outline:hover {
@@ -448,7 +448,7 @@
             font-size: 0.9rem;
         }
         .icon-btn:hover { transform: scale(1.2); }
-        .icon-btn.download { background: #27ae60; }
+        .icon-btn.download { background: #10b981; }
         .icon-btn.delete { background: #c0392b; }
 
         .modal {
@@ -702,7 +702,7 @@
                     <canvas id="preview" width="300" height="200"></canvas>
                     <div class="canvas-controls">
                         <button class="btn-premium btn-outline" onclick="downloadCurrent()">
-                            <i class="fas fa-cloud-arrow-down"></i> Prévisualiser
+                            <i class="fas fa-file-export"></i> Exporter la Tuile
                         </button>
                         <button class="btn-premium btn-primary" onclick="addToList()">
                             <i class="fas fa-folder-plus"></i> Collectionner
@@ -896,7 +896,7 @@
             if (!content || content === 'none') return null;
             return { 
                 char: content, 
-                family: window.getComputedStyle(p).getPropertyValue('font-family'),
+                family: window.getComputedStyle(p).getPropertyValue('font-family').replace(/['"]/g, ''),
                 weight: window.getComputedStyle(p).getPropertyValue('font-weight')
             };
         }
@@ -940,7 +940,16 @@
         function renderIconGrid(icons) {
             const grid = document.getElementById('iconGrid');
             grid.innerHTML = '';
-            icons.slice(0, 200).forEach(icon => {
+            
+            if (icons.length === 0) {
+                grid.innerHTML = `<div class="empty-placeholder" style="grid-column: 1/-1; padding: 40px;">
+                    <i class="fas fa-search"></i>
+                    <p>Aucune icône trouvée</p>
+                </div>`;
+                return;
+            }
+
+            icons.slice(0, 400).forEach(icon => {
                 const box = document.createElement('div');
                 box.className = 'icon-box';
                 box.innerHTML = `<i class="${icon.class}"></i><span>${icon.label}</span>`;
