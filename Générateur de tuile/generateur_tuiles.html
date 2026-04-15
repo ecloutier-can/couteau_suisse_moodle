@@ -204,6 +204,62 @@
             color: #888;
             margin-top: 5px;
         }
+
+        /* Styles pour le sélecteur d'icônes avec recherche */
+        .dropdown-container {
+            position: relative;
+        }
+        .dropdown-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #2a2a4a;
+            border: 1px solid #444;
+            border-top: none;
+            max-height: 250px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+            border-radius: 0 0 5px 5px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+        .dropdown-item {
+            padding: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background 0.2s;
+        }
+        .dropdown-item:hover, .dropdown-item.selected {
+            background: #3a3a6a;
+        }
+        .dropdown-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Styles pour l'opacité précise */
+        .precision-slider {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .btn-step {
+            padding: 5px 10px;
+            background: #2a2a4a;
+            border: 1px solid #444;
+            color: #fff;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+        .btn-step:hover {
+            background: #3a3a6a;
+            border-color: #667eea;
+        }
     </style>
 </head>
 <body>
@@ -259,17 +315,29 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="iconClass">Icône Font Awesome 6 (ex: fa-solid fa-house)</label>
-                    <input type="text" id="iconClass" placeholder="fa-solid fa-star">
-                    <div class="info-text">Trouvez les noms sur fontawesome.com</div>
+                    <label for="iconClass">Icône Font Awesome 6</label>
+                    <div class="dropdown-container">
+                        <input type="text" id="iconSearch" placeholder="Rechercher une icône (ex: livre, maison...)" autocomplete="off">
+                        <div id="iconDropdown" class="dropdown-results"></div>
+                    </div>
+                    <input type="hidden" id="iconClass">
+                    <div class="info-text">Cliquez pour voir les populaires ou tapez un mot-clé (fr/en)</div>
                 </div>
 
                 <div class="form-group">
-                    <label>Couleur et Opacité de l'icône</label>
+                    <label>Couleur de l'icône</label>
                     <div class="color-preview">
-                        <input type="color" id="iconColor" value="#ffffff">
+                        <input type="color" id="iconColor" value="#ffffff" style="width: 100%;">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Opacité de l'icône</label>
+                    <div class="precision-slider">
+                        <button class="btn-step" onclick="adjustOpacity(-1)">-</button>
                         <input type="range" id="iconOpacity" min="0" max="100" value="100" style="flex: 1;">
-                        <span class="angle-value" id="iconOpacityValue">100%</span>
+                        <button class="btn-step" onclick="adjustOpacity(1)">+</button>
+                        <span class="angle-value" id="iconOpacityValue" style="min-width: 45px;">100%</span>
                     </div>
                 </div>
 
@@ -360,6 +428,72 @@
 
         let colorIndex = 0;
 
+        // Liste des icônes suggérées (mots-clés en FR et EN pour la recherche)
+        const FA_ICONS = [
+            { name: "Maison", keys: "home house foyer", class: "fa-solid fa-house", popular: true },
+            { name: "Diplôme", keys: "graduation cap degree diplome", class: "fa-solid fa-graduation-cap", popular: true },
+            { name: "Livre", keys: "book library reading livre", class: "fa-solid fa-book", popular: true },
+            { name: "Crayon", keys: "pencil pen edit ecole", class: "fa-solid fa-pencil", popular: true },
+            { name: "Étudiant", keys: "student user graduate eleve", class: "fa-solid fa-user-graduate", popular: true },
+            { name: "Microscope", keys: "science microscope lab recherche", class: "fa-solid fa-microscope", popular: true },
+            { name: "Éprouvette", keys: "flask chemistry test chimie", class: "fa-solid fa-flask", popular: true },
+            { name: "Atome", keys: "atom physics science", class: "fa-solid fa-atom", popular: true },
+            { name: "Calculatrice", keys: "calculator math science", class: "fa-solid fa-calculator", popular: true },
+            { name: "Palette", keys: "palette art design drawing dessin", class: "fa-solid fa-palette", popular: true },
+            { name: "Musique", keys: "music note song", class: "fa-solid fa-music", popular: true },
+            { name: "Langues", keys: "language translate speak", class: "fa-solid fa-language", popular: true },
+            { name: "Globe", keys: "earth globe map geographie", class: "fa-solid fa-earth-americas", popular: true },
+            { name: "Cerveau", keys: "brain mind psychology intelligence", class: "fa-solid fa-brain", popular: true },
+            { name: "Ampoule", keys: "lightbulb idea inspiration", class: "fa-solid fa-lightbulb", popular: true },
+            { name: "Médaille", keys: "medal award prize", class: "fa-solid fa-medal", popular: true },
+            { name: "Certificat", keys: "certificate award diploma", class: "fa-solid fa-certificate", popular: true },
+            { name: "Calendrier", keys: "calendar date schedule echeance", class: "fa-solid fa-calendar-days", popular: true },
+            { name: "Horloge", keys: "clock time watch", class: "fa-solid fa-clock", popular: true },
+            { name: "Vidéo", keys: "video movie film camera", class: "fa-solid fa-video", popular: true },
+            { name: "Micro", keys: "microphone podcast record", class: "fa-solid fa-microphone", popular: true },
+            { name: "Casque", keys: "headphones music audio listen", class: "fa-solid fa-headphones", popular: true },
+            { name: "Ordinateur", keys: "laptop computer pc", class: "fa-solid fa-laptop", popular: true },
+            { name: "Code", keys: "code programming develop dev", class: "fa-solid fa-code", popular: true },
+            { name: "Wifi", keys: "wifi internet network connection", class: "fa-solid fa-wifi", popular: true },
+            { name: "Base de données", keys: "database server storage", class: "fa-solid fa-database", popular: true },
+            { name: "Étoile", keys: "star favorite", class: "fa-solid fa-star", popular: true },
+            { name: "Cœur", keys: "heart love", class: "fa-solid fa-heart", popular: true },
+            { name: "Pouce levé", keys: "thumbs up like bien", class: "fa-solid fa-thumbs-up", popular: true },
+            { name: "Check", keys: "check mark validate ok", class: "fa-solid fa-check", popular: true },
+            { name: "Attention", keys: "warning exclamation triangle", class: "fa-solid fa-exclamation-triangle", popular: true },
+            { name: "Question", keys: "question help aide", class: "fa-solid fa-question-circle", popular: true },
+            { name: "Info", keys: "info information", class: "fa-solid fa-info-circle", popular: true },
+            { name: "Utilisateur", keys: "user person human", class: "fa-solid fa-user", popular: true },
+            { name: "Groupe", keys: "users group team people", class: "fa-solid fa-users", popular: true },
+            { name: "Fichier", keys: "file document page paper", class: "fa-solid fa-file-lines", popular: true },
+            { name: "Dossier", keys: "folder open open-folder", class: "fa-solid fa-folder-open", popular: true },
+            { name: "Loupe", keys: "search magnifying glass", class: "fa-solid fa-magnifying-glass", popular: true },
+            { name: "Engrenage", keys: "gear settings config", class: "fa-solid fa-gear", popular: true },
+            { name: "Poubelle", keys: "trash delete remove", class: "fa-solid fa-trash", popular: true },
+            { name: "Plus", keys: "plus add", class: "fa-solid fa-plus", popular: true },
+            { name: "Moins", keys: "minus remove", class: "fa-solid fa-minus", popular: true },
+            { name: "ADN", keys: "dna biology science genetique", class: "fa-solid fa-dna" },
+            { name: "Calcul", keys: "divide math calculation", class: "fa-solid fa-divide" },
+            { name: "Règle", keys: "ruler draft measure", class: "fa-solid fa-ruler-combined" },
+            { name: "Bus", keys: "bus transport school ecole", class: "fa-solid fa-bus" },
+            { name: "Vélo", keys: "bicycle bike sport", class: "fa-solid fa-bicycle" },
+            { name: "Course", keys: "running person run sport", class: "fa-solid fa-person-running" },
+            { name: "Alimentation", keys: "apple food fruit nutrition", class: "fa-solid fa-apple-whole" },
+            { name: "Sport", keys: "basketball ball sport", class: "fa-solid fa-basketball" },
+            { name: "Football", keys: "football ball sport", class: "fa-solid fa-football" },
+            { name: "Haltère", keys: "dumbbell sport weight gym", class: "fa-solid fa-dumbbell" },
+            { name: "Message", keys: "envelope mail email", class: "fa-solid fa-envelope" },
+            { name: "Bulle", keys: "comment chat message", class: "fa-solid fa-comment" },
+            { name: "Boussole", keys: "compass direction travel", class: "fa-solid fa-compass" },
+            { name: "Partager", keys: "share nodes network", class: "fa-solid fa-share-nodes" },
+            { name: "Lien", keys: "link url connection", class: "fa-solid fa-link" },
+            { name: "Téléchargement", keys: "download path down", class: "fa-solid fa-download" },
+            { name: "Soleil", keys: "sun weather bright", class: "fa-solid fa-sun" },
+            { name: "Lune", keys: "moon weather dark night", class: "fa-solid fa-moon" },
+            { name: "Arbre", keys: "tree nature plant", class: "fa-solid fa-tree" },
+            { name: "Feuille", keys: "leaf nature plant ecology", class: "fa-solid fa-leaf" },
+        ];
+
         // Event listeners
         document.querySelectorAll('.type-btn').forEach(btn => {
             btn.addEventListener('click', () => {
@@ -381,10 +515,63 @@
         document.getElementById('useCustomColors').addEventListener('change', updatePreview);
 
         // Icon event listeners
-        document.getElementById('iconClass').addEventListener('input', (e) => {
-            iconClass = e.target.value.trim();
-            updatePreview();
+        const iconSearch = document.getElementById('iconSearch');
+        const iconDropdown = document.getElementById('iconDropdown');
+
+        iconSearch.addEventListener('focus', () => filterIcons(iconSearch.value));
+        iconSearch.addEventListener('input', (e) => filterIcons(e.target.value));
+
+        // Fermer le dropdown si on clique ailleurs
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.dropdown-container')) {
+                iconDropdown.style.display = 'none';
+            }
         });
+
+        function filterIcons(query) {
+            const results = FA_ICONS.filter(icon => {
+                if (!query) return icon.popular;
+                const q = query.toLowerCase();
+                return icon.name.toLowerCase().includes(q) || 
+                       icon.keys.toLowerCase().includes(q) || 
+                       icon.class.toLowerCase().includes(q);
+            });
+
+            renderDropdown(results);
+        }
+
+        function renderDropdown(icons) {
+            iconDropdown.innerHTML = '';
+            if (icons.length === 0) {
+                iconDropdown.innerHTML = '<div class="dropdown-item">Aucune icône trouvée</div>';
+            } else {
+                icons.forEach(icon => {
+                    const item = document.createElement('div');
+                    item.className = 'dropdown-item';
+                    item.innerHTML = `<i class="${icon.class}"></i> <span>${icon.name}</span>`;
+                    item.onclick = () => {
+                        document.getElementById('iconClass').value = icon.class;
+                        iconSearch.value = icon.name;
+                        iconClass = icon.class;
+                        iconDropdown.style.display = 'none';
+                        updatePreview();
+                    };
+                    iconDropdown.appendChild(item);
+                });
+            }
+            iconDropdown.style.display = 'block';
+        }
+
+        function adjustOpacity(step) {
+            const slider = document.getElementById('iconOpacity');
+            let val = parseInt(slider.value) + step;
+            val = Math.max(0, Math.min(100, val));
+            slider.value = val;
+            iconOpacity = val / 100;
+            document.getElementById('iconOpacityValue').textContent = val + '%';
+            updatePreview();
+        }
+
         document.getElementById('iconColor').addEventListener('input', (e) => {
             iconColor = e.target.value;
             updatePreview();
