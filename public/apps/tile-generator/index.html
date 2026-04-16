@@ -676,7 +676,7 @@
                     <label>Échelle de l'icône</label>
                     <div class="slider-wrapper">
                         <i class="fas fa-minus" style="font-size: 0.7rem; color: var(--text-dim);"></i>
-                        <input type="range" id="iconSize" min="10" max="400" value="80">
+                        <input type="range" id="iconSizeSlider" min="10" max="400" value="80">
                         <i class="fas fa-plus" style="font-size: 0.7rem; color: var(--text-dim);"></i>
                         <span class="range-value" id="iconSizeValue">80px</span>
                     </div>
@@ -755,10 +755,15 @@
         </div>
     </div>
 
+    <div id="font-preloaders" style="position: absolute; left: -9999px; visibility: hidden; opacity: 0; pointer-events: none;">
+        <span style="font-family: 'Font Awesome 6 Free'; font-weight: 900;">Solid</span>
+        <span style="font-family: 'Font Awesome 6 Free'; font-weight: 400;">Regular</span>
+        <span style="font-family: 'Font Awesome 6 Brands'; font-weight: 400;">Brands</span>
+    </div>
     <i id="icon-proxy" class="" style="position: absolute; left: -9999px; visibility: hidden;"></i>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <script src="icons_data.js"></script>
+    <script src="/apps/tile-generator/icons_data.js"></script>
     <script>
         const canvas = document.getElementById('preview');
         const ctx = canvas.getContext('2d');
@@ -812,26 +817,51 @@
             const iconInfo = showIcon ? getIconInfo(iconClass) : null;
             
             if (iconInfo) {
-                ctx.save();
-                ctx.globalAlpha = iconOpacity;
-                ctx.fillStyle = iconColor;
-                ctx.font = `${iconInfo.weight} ${iconSize}px "${iconInfo.family}"`;
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
+                const cleanFamily = iconInfo.family.replace(/"/g, '');
+                const fontSpec = `${iconInfo.weight} ${iconSize}px "${cleanFamily}"`;
+                
+                // Update invisible DOM proxy to force font load/activation
+                const proxy = document.getElementById('icon-proxy');
+                if (proxy) {
+                    proxy.className = iconClass;
+                    proxy.style.fontFamily = `"${cleanFamily}"`;
+                    proxy.style.fontWeight = iconInfo.weight;
+                }
 
-                let x = WIDTH / 2;
-                let y = HEIGHT / 2;
+                // Ensure font is ready before drawing
+                if (document.fonts) {
+                    document.fonts.load(fontSpec).then(() => {
+                        // Double check if it's REALLY loaded by measuring
+                        ctx.font = fontSpec;
+                        const metrics = ctx.measureText(iconInfo.char);
+                        
+                        // If width is very small or suspicious, it might be a fallback box
+                        // We'll proceed but this gives us a hook for retries if needed
+                        
+                        ctx.save();
+                        ctx.globalAlpha = iconOpacity;
+                        ctx.fillStyle = iconColor;
+                        ctx.font = fontSpec;
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
 
-                if (iconHPos === 'left') x = MARGIN_SIDE + iconSize/4;
-                if (iconHPos === 'right') x = WIDTH - MARGIN_SIDE - iconSize/4;
-                if (iconVPos === 'top') y = TOP_ZONE + iconSize/4;
-                if (iconVPos === 'bottom') y = HEIGHT - MARGIN_SIDE - iconSize/4;
+                        let x = WIDTH / 2;
+                        let y = HEIGHT / 2;
 
-                // Add glass shadow to icon
-                ctx.shadowColor = 'rgba(0,0,0,0.3)';
-                ctx.shadowBlur = 15;
-                ctx.fillText(iconInfo.char, x, y);
-                ctx.restore();
+                        if (iconHPos === 'left') x = MARGIN_SIDE + iconSize/4;
+                        if (iconHPos === 'right') x = WIDTH - MARGIN_SIDE - iconSize/4;
+                        if (iconVPos === 'top') y = TOP_ZONE + iconSize/4;
+                        if (iconVPos === 'bottom') y = HEIGHT - MARGIN_SIDE - iconSize/4;
+
+                        ctx.shadowColor = 'rgba(0,0,0,0.3)';
+                        ctx.shadowBlur = 15;
+                        ctx.fillText(iconInfo.char, x, y);
+                        ctx.restore();
+                        
+                        // Redraw text to keep it on top
+                        drawCustomText(ctx, title, subject, WIDTH, HEIGHT);
+                    });
+                }
             }
 
             // Draw Text
@@ -901,19 +931,20 @@
             const icon = faIcons.find(i => i.class === cls);
             if (!icon) return null;
 
-            // Map styles to FontAwesome 6 font families
-            let family = '"Font Awesome 6 Free"';
-            let weight = '900';
+            // Mapping for FontAwesome 6 subfamilies
+            let family = 'Font Awesome 6 Free';
+            let weight = '900'; // Default for Solid
             
             if (icon.style === 'brands') {
-                family = '"Font Awesome 6 Brands"';
+                family = 'Font Awesome 6 Brands';
                 weight = '400';
             } else if (icon.style === 'regular') {
+                family = 'Font Awesome 6 Free';
                 weight = '400';
             }
 
             return { 
-                char: String.fromCharCode(parseInt(icon.unicode, 16)), 
+                char: String.fromCodePoint(parseInt(icon.unicode, 16)), 
                 family: family,
                 weight: weight
             };
@@ -936,7 +967,7 @@
             };
         });
 
-        const inputIds = ['title', 'subject', 'angle', 'color1', 'color2', 'iconColor', 'iconOpacity', 'iconSize', 'iconHPos', 'iconVPos'];
+        const inputIds = ['title', 'subject', 'angle', 'color1', 'color2', 'iconColor', 'iconOpacity', 'iconSizeSlider', 'iconHPos', 'iconVPos'];
         inputIds.forEach(id => {
             const el = document.getElementById(id);
             if (!el) return;
@@ -948,7 +979,7 @@
                     iconOpacity = val / 100;
                     document.getElementById('iconOpacityValue').textContent = iconOpacity.toFixed(1);
                 }
-                if (id === 'iconSize') {
+                if (id === 'iconSizeSlider') {
                     iconSize = parseInt(val);
                     document.getElementById('iconSizeValue').textContent = iconSize + 'px';
                 }
@@ -977,23 +1008,20 @@
                         <p style="margin-top: 20px; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; color: var(--text-dim);">Chargement des icônes...</p>
                     </div>`;
                     
-                    // Fallback to fetch if script didn't load for some reason
-                    try {
-                        let baseUrl = window.location.pathname;
-                        if (baseUrl.includes('.') || !baseUrl.endsWith('/')) {
-                            baseUrl = baseUrl.substring(0, baseUrl.lastIndexOf('/') + 1);
+                    // The script is loaded in the header, so it should be there.
+                    // If not, we wait briefly or report error.
+                    setTimeout(() => {
+                        if (window.FA_ICONS) {
+                            faIcons = window.FA_ICONS;
+                            setStyleFilter('all');
+                        } else {
+                            grid.innerHTML = `<div class="empty-placeholder" style="grid-column: 1 / -1; padding: 80px 40px;">
+                                <i class="fas fa-exclamation-triangle" style="color: #c0392b;"></i>
+                                <p>Échec du chargement des icônes. Veuillez rafraîchir la page.</p>
+                            </div>`;
                         }
-                        const response = await fetch(baseUrl + 'icons_data.json');
-                        if (!response.ok) throw new Error('Load failed');
-                        faIcons = await response.json();
-                    } catch (e) {
-                        console.error("Icon load error:", e);
-                        grid.innerHTML = `<div class="empty-placeholder" style="grid-column: 1 / -1; padding: 80px 40px;">
-                            <i class="fas fa-exclamation-triangle" style="color: #c0392b;"></i>
-                            <p>Échec du chargement des icônes</p>
-                        </div>`;
-                        return;
-                    }
+                    }, 1000);
+                    return;
                 }
             }
             
