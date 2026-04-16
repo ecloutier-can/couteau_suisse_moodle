@@ -768,11 +768,11 @@
         const canvas = document.getElementById('preview');
         const ctx = canvas.getContext('2d');
 
-        const WIDTH = 300;
-        const HEIGHT = 200;
-        const MARGIN_SIDE = 25;
-        const TOP_ZONE = 55;
-        const CENTER_ZONE = 90;
+        const WIDTH = 600;
+        const HEIGHT = 400;
+        const MARGIN_SIDE = 50;
+        const TOP_ZONE = 110;
+        const CENTER_ZONE = 180;
 
         let currentType = 'semaine';
         let tilesList = [];
@@ -810,7 +810,7 @@
             const angle = parseInt(document.getElementById('angle').value);
             
             drawGradient(ctx, WIDTH, HEIGHT, c1, c2, angle);
-            drawDiagonalLines(ctx, WIDTH, HEIGHT, 25, 0.08);
+            drawDiagonalLines(ctx, WIDTH, HEIGHT, 40, 0.08);
 
             // Draw Icon
             const showIcon = document.getElementById('showIcon').checked;
@@ -900,16 +900,16 @@
             
             // Title
             if (title) {
-                ctx.font = 'bold 18px "Inter", sans-serif';
+                ctx.font = 'bold 32px "Inter", sans-serif';
                 ctx.fillStyle = 'white';
                 ctx.shadowColor = 'rgba(0,0,0,0.5)';
                 ctx.shadowBlur = 4;
-                ctx.fillText(title, MARGIN_SIDE, 35);
+                ctx.fillText(title, MARGIN_SIDE, 60);
             }
 
             // Subject (Multi-line)
             if (subject) {
-                let fs = 26;
+                let fs = 48;
                 ctx.font = `800 ${fs}px "Outfit", sans-serif`;
                 const lines = subject.split('\n');
                 const lineHeight = fs * 1.1;
