@@ -611,13 +611,24 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="title">Titre supérieur</label>
+                    <label for="title">Titre</label>
                     <input type="text" id="title" placeholder="Ex: Semaine 1, Chapitre 3...">
                 </div>
 
                 <div class="form-group">
-                    <label for="subject">Sujet principal</label>
-                    <textarea id="subject" placeholder="Ex: Structure de la cellule&#10;et organites" rows="3"></textarea>
+                    <label>Position du titre</label>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                        <select id="textHPos">
+                            <option value="left" selected>Gauche</option>
+                            <option value="center">Centre</option>
+                            <option value="right">Droite</option>
+                        </select>
+                        <select id="textVPos">
+                            <option value="top" selected>Haut</option>
+                            <option value="mid">Milieu</option>
+                            <option value="bottom">Bas</option>
+                        </select>
+                    </div>
                 </div>
 
                 <div class="section-title">Atmosphère & Styles</div>
@@ -777,6 +788,9 @@
         let currentType = 'semaine';
         let tilesList = [];
         
+        let textHPos = 'left';
+        let textVPos = 'top';
+
         // Icon state
         let faIcons = null;
         let iconClass = 'fa-solid fa-book-open';
@@ -848,10 +862,10 @@
                         let x = WIDTH / 2;
                         let y = HEIGHT / 2;
 
-                        if (iconHPos === 'left') x = MARGIN_SIDE + iconSize/4;
-                        if (iconHPos === 'right') x = WIDTH - MARGIN_SIDE - iconSize/4;
-                        if (iconVPos === 'top') y = TOP_ZONE + iconSize/4;
-                        if (iconVPos === 'bottom') y = HEIGHT - MARGIN_SIDE - iconSize/4;
+                        if (iconHPos === 'left') x = MARGIN_SIDE + iconSize/2;
+                        if (iconHPos === 'right') x = WIDTH - MARGIN_SIDE - iconSize/2;
+                        if (iconVPos === 'top') y = MARGIN_SIDE + iconSize/2;
+                        if (iconVPos === 'bottom') y = HEIGHT - MARGIN_SIDE - iconSize/2;
 
                         ctx.shadowColor = 'rgba(0,0,0,0.3)';
                         ctx.shadowBlur = 15;
@@ -866,8 +880,7 @@
 
             // Draw Text
             const title = document.getElementById('title').value;
-            const subject = document.getElementById('subject').value;
-            drawCustomText(ctx, title, subject, WIDTH, HEIGHT);
+            drawCustomText(ctx, title, WIDTH, HEIGHT);
         }
 
         function drawGradient(ctx, width, height, color1, color2, angle) {
@@ -914,72 +927,50 @@
             return lines;
         }
 
-        function drawCustomText(ctx, title, subject, width, height) {
+        function drawCustomText(ctx, title, width, height) {
+            if (!title) return;
             const maxW = width - (MARGIN_SIDE * 2);
+            const maxH = height - (MARGIN_SIDE * 2);
             
-            // 1. Draw Title (Top Zone: 0-100)
-            if (title) {
-                let titleFontSize = 32;
-                ctx.font = `bold ${titleFontSize}px "Inter", sans-serif`;
-                
-                // Wrap title if needed
-                let titleLines = wrapText(ctx, title, maxW);
-                const titleLineHeight = titleFontSize * 1.2;
-                const titleTotalH = titleLines.length * titleLineHeight;
-                
-                // Vertical Center in TOP_ZONE
-                let titleY = (TOP_ZONE - titleTotalH) / 2 + titleFontSize - 5;
+            let fs = 42;
+            let titleLines = [];
+            let totalH = 0;
+            let lineHeight = 0;
 
-                ctx.save();
-                ctx.fillStyle = 'white';
-                ctx.textAlign = 'left';
-                ctx.shadowColor = 'rgba(0,0,0,0.5)';
-                ctx.shadowBlur = 4;
+            // Shrink-to-Fit Loop for Title
+            while (fs >= 14) {
+                ctx.font = `bold ${fs}px "Inter", sans-serif`;
+                titleLines = wrapText(ctx, title, maxW);
+                lineHeight = fs * 1.2;
+                totalH = titleLines.length * lineHeight;
                 
-                titleLines.forEach((line, i) => {
-                    ctx.fillText(line.trim(), MARGIN_SIDE, titleY + (i * titleLineHeight));
-                });
-                ctx.restore();
+                if (totalH <= maxH) break;
+                fs -= 2;
             }
 
-            // 2. Draw Subject (Center Zone: 100 - 380)
-            if (subject) {
-                let fs = 48;
-                let subjectLines = [];
-                let totalH = 0;
-                let lineHeight = 0;
+            // Determine X and TextAlign
+            let x = width / 2;
+            let textAlign = 'center';
+            if (textHPos === 'left') { x = MARGIN_SIDE; textAlign = 'left'; }
+            if (textHPos === 'right') { x = width - MARGIN_SIDE; textAlign = 'right'; }
 
-                // Shrink-to-Fit Loop
-                while (fs >= 18) {
-                    ctx.font = `800 ${fs}px "Outfit", sans-serif`;
-                    const sourceLines = subject.split('\n');
-                    subjectLines = [];
-                    
-                    for (const sLine of sourceLines) {
-                        subjectLines.push(...wrapText(ctx, sLine, maxW));
-                    }
-                    
-                    lineHeight = fs * 1.1;
-                    totalH = subjectLines.length * lineHeight;
-                    
-                    if (totalH <= CENTER_ZONE) break;
-                    fs -= 2;
-                }
+            // Determine Start Y
+            let startY = 0;
+            if (textVPos === 'top') startY = MARGIN_SIDE + fs * 0.8;
+            else if (textVPos === 'mid') startY = (height - totalH) / 2 + fs * 0.8;
+            else if (textVPos === 'bottom') startY = height - MARGIN_SIDE - totalH + fs * 0.8;
 
-                ctx.save();
-                ctx.fillStyle = 'white';
-                ctx.textAlign = 'center';
-                ctx.shadowColor = 'rgba(0,0,0,0.6)';
-                ctx.shadowBlur = 6;
-
-                // Vertical Center in CENTER_ZONE (starting after TOP_ZONE)
-                let startY = TOP_ZONE + (CENTER_ZONE - totalH)/2 + fs/1.2;
-                
-                subjectLines.forEach((line, i) => {
-                    ctx.fillText(line.trim(), width/2, startY + (i * lineHeight));
-                });
-                ctx.restore();
-            }
+            ctx.save();
+            ctx.fillStyle = 'white';
+            ctx.textAlign = textAlign;
+            ctx.font = `bold ${fs}px "Inter", sans-serif`;
+            ctx.shadowColor = 'rgba(0,0,0,0.6)';
+            ctx.shadowBlur = 6;
+            
+            titleLines.forEach((line, i) => {
+                ctx.fillText(line.trim(), x, startY + (i * lineHeight));
+            });
+            ctx.restore();
         }
 
         function getIconInfo(cls) {
@@ -1023,7 +1014,7 @@
             };
         });
 
-        const inputIds = ['title', 'subject', 'angle', 'color1', 'color2', 'iconColor', 'iconOpacity', 'iconSizeSlider', 'iconHPos', 'iconVPos'];
+        const inputIds = ['title', 'textHPos', 'textVPos', 'angle', 'color1', 'color2', 'iconColor', 'iconOpacity', 'iconSizeSlider', 'iconHPos', 'iconVPos'];
         inputIds.forEach(id => {
             const el = document.getElementById(id);
             if (!el) return;
@@ -1044,6 +1035,8 @@
                 if (id === 'iconColor') iconColor = val;
                 if (id === 'iconHPos') iconHPos = val;
                 if (id === 'iconVPos') iconVPos = val;
+                if (id === 'textHPos') textHPos = val;
+                if (id === 'textVPos') textVPos = val;
                 
                 updatePreview();
             });
