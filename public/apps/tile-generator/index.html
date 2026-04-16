@@ -758,6 +758,7 @@
     <i id="icon-proxy" class="" style="position: absolute; left: -9999px; visibility: hidden;"></i>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="icons_data.js"></script>
     <script>
         const canvas = document.getElementById('preview');
         const ctx = canvas.getContext('2d');
@@ -896,25 +897,25 @@
         }
 
         function getIconInfo(cls) {
-            const p = document.getElementById('icon-proxy');
-            if (!p) return null;
-            p.className = cls;
+            if (!faIcons) return null;
+            const icon = faIcons.find(i => i.class === cls);
+            if (!icon) return null;
+
+            // Map styles to FontAwesome 6 font families
+            let family = '"Font Awesome 6 Free"';
+            let weight = '900';
             
-            // Force reflow/style calculation
-            void p.offsetWidth;
-            
-            const style = window.getComputedStyle(p, '::before');
-            const content = style.getPropertyValue('content').replace(/['"]/g, '');
-            
-            if (!content || content === 'none' || content === 'normal') {
-                return null;
+            if (icon.style === 'brands') {
+                family = '"Font Awesome 6 Brands"';
+                weight = '400';
+            } else if (icon.style === 'regular') {
+                weight = '400';
             }
-            
-            const mainStyle = window.getComputedStyle(p);
+
             return { 
-                char: content, 
-                family: mainStyle.getPropertyValue('font-family').replace(/['"]/g, ''),
-                weight: mainStyle.getPropertyValue('font-weight')
+                char: String.fromCharCode(parseInt(icon.unicode, 16)), 
+                family: family,
+                weight: weight
             };
         }
 
@@ -968,27 +969,31 @@
             document.getElementById('modalSearch').value = '';
             
             if (!faIcons) {
-                grid.innerHTML = `<div class="empty-placeholder" style="grid-column: 1 / -1; padding: 80px 40px;">
-                    <i class="fas fa-circle-notch fa-spin" style="font-size: 3rem; color: var(--primary);"></i>
-                    <p style="margin-top: 20px; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; color: var(--text-dim);">Initialisation de la bibliothèque...</p>
-                </div>`;
-                
-                try {
-                    // Robust path detect: handle missing trailing slash and filenames
-                    let baseUrl = window.location.pathname;
-                    if (baseUrl.includes('.') || !baseUrl.endsWith('/')) {
-                        baseUrl = baseUrl.substring(0, baseUrl.lastIndexOf('/') + 1);
-                    }
-                    const response = await fetch(baseUrl + 'icons_data.json');
-                    if (!response.ok) throw new Error('Load failed');
-                    faIcons = await response.json();
-                } catch (e) {
-                    console.error("Icon load error:", e);
+                if (window.FA_ICONS) {
+                    faIcons = window.FA_ICONS;
+                } else {
                     grid.innerHTML = `<div class="empty-placeholder" style="grid-column: 1 / -1; padding: 80px 40px;">
-                        <i class="fas fa-exclamation-triangle" style="color: #c0392b;"></i>
-                        <p>Échec du chargement des icônes</p>
+                        <i class="fas fa-circle-notch fa-spin" style="font-size: 3rem; color: var(--primary);"></i>
+                        <p style="margin-top: 20px; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; color: var(--text-dim);">Chargement des icônes...</p>
                     </div>`;
-                    return;
+                    
+                    // Fallback to fetch if script didn't load for some reason
+                    try {
+                        let baseUrl = window.location.pathname;
+                        if (baseUrl.includes('.') || !baseUrl.endsWith('/')) {
+                            baseUrl = baseUrl.substring(0, baseUrl.lastIndexOf('/') + 1);
+                        }
+                        const response = await fetch(baseUrl + 'icons_data.json');
+                        if (!response.ok) throw new Error('Load failed');
+                        faIcons = await response.json();
+                    } catch (e) {
+                        console.error("Icon load error:", e);
+                        grid.innerHTML = `<div class="empty-placeholder" style="grid-column: 1 / -1; padding: 80px 40px;">
+                            <i class="fas fa-exclamation-triangle" style="color: #c0392b;"></i>
+                            <p>Échec du chargement des icônes</p>
+                        </div>`;
+                        return;
+                    }
                 }
             }
             
@@ -1000,15 +1005,19 @@
             if (e.key === 'Enter') {
                 const val = e.target.value.trim().toLowerCase();
                 if (!faIcons) {
-                    openIconModal(); // Trigger load and open modal if data not ready
+                    openIconModal();
                     return;
                 }
+                
+                // Smart search: exact class, label, or first matching tag
                 const found = faIcons.find(i => 
                     i.label.toLowerCase() === val || 
                     i.class.toLowerCase() === val ||
                     i.class.split(' ').pop().toLowerCase() === val ||
-                    i.class.split(' ').pop().replace('fa-', '').toLowerCase() === val
+                    i.class.split(' ').pop().replace('fa-', '').toLowerCase() === val ||
+                    i.search.some(s => s.toLowerCase() === val)
                 );
+
                 if (found) {
                     iconClass = found.class;
                     e.target.value = found.label;
@@ -1016,7 +1025,15 @@
                     e.target.style.background = 'rgba(16, 185, 129, 0.1)';
                     setTimeout(() => e.target.style.background = '', 500);
                 } else {
-                    openIconModal(); // Show modal if no exact match
+                    // Pre-fill modal search and open it
+                    openIconModal();
+                    setTimeout(() => {
+                        const modalSearch = document.getElementById('modalSearch');
+                        if (modalSearch) {
+                            modalSearch.value = val;
+                            filterModalIcons();
+                        }
+                    }, 50);
                 }
             }
         });
