@@ -895,35 +895,91 @@
             }
         }
 
+        // --- Rendering Utilities ---
+
+        function wrapText(ctx, text, maxWidth) {
+            const words = text.split(' ');
+            const lines = [];
+            let currentLine = '';
+            for (const word of words) {
+                const testLine = currentLine ? currentLine + ' ' + word : word;
+                if (ctx.measureText(testLine).width > maxWidth && currentLine) {
+                    lines.push(currentLine);
+                    currentLine = word;
+                } else {
+                    currentLine = testLine;
+                }
+            }
+            if (currentLine) lines.push(currentLine);
+            return lines;
+        }
+
         function drawCustomText(ctx, title, subject, width, height) {
             const maxW = width - (MARGIN_SIDE * 2);
             
-            // Title
+            // 1. Draw Title (Top Zone: 0-100)
             if (title) {
-                ctx.font = 'bold 32px "Inter", sans-serif';
+                let titleFontSize = 32;
+                ctx.font = `bold ${titleFontSize}px "Inter", sans-serif`;
+                
+                // Wrap title if needed
+                let titleLines = wrapText(ctx, title, maxW);
+                const titleLineHeight = titleFontSize * 1.2;
+                const titleTotalH = titleLines.length * titleLineHeight;
+                
+                // Vertical Center in TOP_ZONE
+                let titleY = (TOP_ZONE - titleTotalH) / 2 + titleFontSize - 5;
+
+                ctx.save();
                 ctx.fillStyle = 'white';
+                ctx.textAlign = 'left';
                 ctx.shadowColor = 'rgba(0,0,0,0.5)';
                 ctx.shadowBlur = 4;
-                ctx.fillText(title, MARGIN_SIDE, 60);
+                
+                titleLines.forEach((line, i) => {
+                    ctx.fillText(line.trim(), MARGIN_SIDE, titleY + (i * titleLineHeight));
+                });
+                ctx.restore();
             }
 
-            // Subject (Multi-line)
+            // 2. Draw Subject (Center Zone: 100 - 380)
             if (subject) {
                 let fs = 48;
-                ctx.font = `800 ${fs}px "Outfit", sans-serif`;
-                const lines = subject.split('\n');
-                const lineHeight = fs * 1.1;
-                const totalH = lines.length * lineHeight;
+                let subjectLines = [];
+                let totalH = 0;
+                let lineHeight = 0;
+
+                // Shrink-to-Fit Loop
+                while (fs >= 18) {
+                    ctx.font = `800 ${fs}px "Outfit", sans-serif`;
+                    const sourceLines = subject.split('\n');
+                    subjectLines = [];
+                    
+                    for (const sLine of sourceLines) {
+                        subjectLines.push(...wrapText(ctx, sLine, maxW));
+                    }
+                    
+                    lineHeight = fs * 1.1;
+                    totalH = subjectLines.length * lineHeight;
+                    
+                    if (totalH <= CENTER_ZONE) break;
+                    fs -= 2;
+                }
+
+                ctx.save();
+                ctx.fillStyle = 'white';
+                ctx.textAlign = 'center';
+                ctx.shadowColor = 'rgba(0,0,0,0.6)';
+                ctx.shadowBlur = 6;
+
+                // Vertical Center in CENTER_ZONE (starting after TOP_ZONE)
+                let startY = TOP_ZONE + (CENTER_ZONE - totalH)/2 + fs/1.2;
                 
-                let startY = TOP_ZONE + (CENTER_ZONE - totalH)/2 + fs/2;
-                
-                lines.forEach((line, i) => {
-                    ctx.textAlign = 'center';
-                    ctx.fillText(line, width/2, startY + (i * lineHeight));
+                subjectLines.forEach((line, i) => {
+                    ctx.fillText(line.trim(), width/2, startY + (i * lineHeight));
                 });
+                ctx.restore();
             }
-            // Reset shadows
-            ctx.shadowBlur = 0;
         }
 
         function getIconInfo(cls) {
