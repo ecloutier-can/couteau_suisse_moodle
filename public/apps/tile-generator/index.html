@@ -675,9 +675,7 @@
                 <div class="form-group">
                     <label>Échelle de l'icône</label>
                     <div class="slider-wrapper">
-                        <i class="fas fa-minus" style="font-size: 0.7rem; color: var(--text-dim);"></i>
-                        <input type="range" id="iconSizeSlider" min="10" max="400" value="80">
-                        <i class="fas fa-plus" style="font-size: 0.7rem; color: var(--text-dim);"></i>
+                        <input type="range" id="iconSizeSlider" min="10" max="180" value="80">
                         <span class="range-value" id="iconSizeValue">80px</span>
                     </div>
                 </div>
@@ -707,10 +705,10 @@
                     <canvas id="preview" width="300" height="200"></canvas>
                     <div class="canvas-controls">
                         <button class="btn-premium btn-outline" onclick="downloadCurrent()">
-                            <i class="fas fa-file-export"></i> Exporter la Tuile
+                            <i class="fas fa-file-export"></i> Télécharger (300x200)
                         </button>
                         <button class="btn-premium btn-primary" onclick="addToList()">
-                            <i class="fas fa-folder-plus"></i> Collectionner
+                            <i class="fas fa-folder-plus"></i> Ajouter à la Liste
                         </button>
                     </div>
                 </div>
@@ -768,11 +766,11 @@
         const canvas = document.getElementById('preview');
         const ctx = canvas.getContext('2d');
 
-        const WIDTH = 600;
-        const HEIGHT = 400;
-        const MARGIN_SIDE = 50;
-        const TOP_ZONE = 110;
-        const CENTER_ZONE = 180;
+        const WIDTH = 300;
+        const HEIGHT = 200;
+        const MARGIN_SIDE = 20;
+        const TOP_ZONE = 50;
+        const CENTER_ZONE = 100;
 
         let currentType = 'semaine';
         let tilesList = [];
@@ -934,34 +932,34 @@
         function drawCustomText(ctx, title, subject, width, height) {
             const maxW = width - (MARGIN_SIDE * 2);
             
-            // 1. Draw Title (Top Zone: 0-110)
+            // 1. Draw Title (Top Zone: 0-50)
             if (title) {
-                let titleFontSize = 32;
+                let titleFontSize = 20;
                 let titleLines = [title];
                 
                 ctx.font = `bold ${titleFontSize}px "Inter", sans-serif`;
                 let titleWidth = ctx.measureText(title).width;
 
                 if (titleWidth > maxW) {
-                    titleFontSize = fitText(ctx, title, maxW, 32, 18, "Inter");
+                    titleFontSize = fitText(ctx, title, maxW, 20, 12, "Inter");
                     ctx.font = `bold ${titleFontSize}px "Inter", sans-serif`;
                     titleLines = wrapText(ctx, title, maxW, titleFontSize, "Inter");
                 }
                 
                 const titleLineHeight = titleFontSize * 1.2;
                 const titleTotalH = titleLines.length * titleLineHeight;
-                let titleY = (TOP_ZONE - titleTotalH) / 2 + titleFontSize - 5;
+                let titleY = (TOP_ZONE - titleTotalH) / 2 + titleFontSize - 3;
 
                 ctx.save();
                 ctx.fillStyle = 'white';
                 ctx.textAlign = 'left';
                 ctx.font = `bold ${titleFontSize}px "Inter", sans-serif`;
                 
-                // Advanced drop shadow
+                // Shadow
                 ctx.shadowColor = 'rgba(0,0,0,0.5)';
-                ctx.shadowBlur = 4;
-                ctx.shadowOffsetX = 2;
-                ctx.shadowOffsetY = 2;
+                ctx.shadowBlur = 3;
+                ctx.shadowOffsetX = 1.5;
+                ctx.shadowOffsetY = 1.5;
                 
                 titleLines.forEach((line, i) => {
                     ctx.fillText(line.trim(), MARGIN_SIDE, titleY + (i * titleLineHeight));
@@ -969,14 +967,14 @@
                 ctx.restore();
             }
 
-            // 2. Draw Subject (Center Zone: 110 - 290)
+            // 2. Draw Subject (Center Zone: 50 - 150)
             if (subject) {
-                let subjectFontSize = 52;
+                let subjectFontSize = 28;
                 const sourceLines = subject.split('\n');
                 let allLines = [];
                 let needsResize = true;
 
-                while (needsResize && subjectFontSize >= 18) {
+                while (needsResize && subjectFontSize >= 14) {
                     allLines = [];
                     ctx.font = `800 ${subjectFontSize}px "Outfit", sans-serif`;
 
@@ -993,7 +991,7 @@
                     if (totalH <= CENTER_ZONE) {
                         needsResize = false;
                     } else {
-                        subjectFontSize -= 2;
+                        subjectFontSize -= 1;
                     }
                 }
 
@@ -1002,11 +1000,11 @@
                 ctx.textAlign = 'center';
                 ctx.font = `800 ${subjectFontSize}px "Outfit", sans-serif`;
                 
-                // Higher contrast shadow for main subject
+                // Shadow
                 ctx.shadowColor = 'rgba(0,0,0,0.6)';
-                ctx.shadowBlur = 6;
-                ctx.shadowOffsetX = 3;
-                ctx.shadowOffsetY = 3;
+                ctx.shadowBlur = 5;
+                ctx.shadowOffsetX = 2;
+                ctx.shadowOffsetY = 2;
 
                 const lineHeight = subjectFontSize * 1.2;
                 const totalH = allLines.length * lineHeight;
