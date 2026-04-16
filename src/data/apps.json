@@ -30,6 +30,16 @@
     "category": "Design"
   },
   {
+    "id": "bandeau-generator",
+    "name": "Générateur de Bandeau",
+    "tagline": "Bandeaux de cours structurés",
+    "description": "Créez des bandeaux professionnels pour vos cours Moodle avec objectifs et modules. Générez le code HTML prêt à l'emploi.",
+    "path": "https://ecloutier-can.github.io/bandeau_moodle/",
+    "icon": "Layout",
+    "color": "#3b82f6",
+    "category": "Design"
+  },
+  {
     "id": "youtube-interactive",
     "name": "YouTube Interactif",
     "tagline": "Ajoutez des interactions à vos vidéos",

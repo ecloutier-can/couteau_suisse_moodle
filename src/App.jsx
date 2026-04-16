@@ -8,7 +8,7 @@ import {
 import appsData from './data/apps.json';
 
 const IconMap = {
-  FileCode, Palette, LayoutGrid, Youtube, Pencil, Shield, Layers, Brain, Vote, MessageSquarePlus
+  FileCode, Palette, LayoutGrid, Youtube, Pencil, Shield, Layers, Brain, Vote, MessageSquarePlus, Layout
 };
 
 const Sidebar = ({ activeCategory, setCategory, isOpen, setIsOpen }) => {
