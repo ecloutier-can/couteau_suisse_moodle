@@ -8,7 +8,11 @@
     <meta name="description" content="Éditeur de questions Cloze moderne pour Moodle. Générez du code sans effort.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <!-- OGL Animation Container -->
+
     <!-- Quill.js CSS -->
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
     <style>
@@ -33,16 +37,32 @@
         }
 
         body {
-            background-color: var(--bg-color);
+            background-color: #080808;
             color: var(--text-main);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             overflow-x: hidden;
-            background-image:
-                radial-gradient(circle at 20% 20%, rgba(124, 77, 255, 0.05) 0%, transparent 40%),
-                radial-gradient(circle at 80% 80%, rgba(0, 229, 255, 0.05) 0%, transparent 40%);
+            position: relative;
         }
+
+        #background-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        @keyframes shine {
+            to {
+                background-position: 200% center;
+            }
+        }
+
+
 
         header {
             padding: 2rem 1rem;
@@ -56,12 +76,24 @@
         }
 
         h1 {
-            font-weight: 700;
-            letter-spacing: -0.02em;
-            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 800;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary), var(--accent-primary));
+            background-size: 200% auto;
             -webkit-background-clip: text;
+            background-clip: text;
             -webkit-text-fill-color: transparent;
-            font-size: 1.5rem;
+            font-size: 2.2rem;
+            filter: drop-shadow(0 0 15px rgba(124, 77, 255, 0.4));
+            animation: shine 5s linear infinite;
+        }
+
+        @keyframes shine {
+            to {
+                background-position: 200% center;
+            }
         }
 
         main {
@@ -81,8 +113,21 @@
             border-radius: 16px;
             padding: 1.5rem;
             backdrop-filter: var(--glass-blur);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-            transition: transform 0.3s ease, border-color 0.3s ease;
+            -webkit-backdrop-filter: var(--glass-blur);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
         }
 
         .card:hover {
@@ -405,10 +450,12 @@
 </head>
 
 <body>
+    <div id="background-container"></div>
+
 
     <header style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem;">
         <div style="flex: 1;"></div>
-        <h1 style="flex: 2;">Moodle Cloze Editor</h1>
+        <h1 style="flex: 2;">MOODLE CLOZE EDITOR</h1>
         <div style="flex: 1; text-align: right;">
             <button class="btn guide-btn" onclick="openTutorial()">
                 📖 Guide Utilisation
@@ -422,9 +469,14 @@
             <div class="editor-container">
                 <div style="display: flex; justify-content: space-between; align-items: flex-end;">
                     <label>Texte de la Question</label>
-                    <button class="btn" onclick="openClozeModal()">
-                        <span>+</span> Insérer Cloze
-                    </button>
+                    <div style="display: flex; gap: 1rem;">
+                        <button class="btn btn-secondary" onclick="openTableModal()">
+                            <span>📊</span> Insérer un Tableau
+                        </button>
+                        <button class="btn" onclick="openClozeModal()">
+                            <span>+</span> Insérer Cloze
+                        </button>
+                    </div>
                 </div>
                 <div id="mainEditor"></div>
             </div>
@@ -448,7 +500,7 @@
     <div class="modal-overlay" id="modalOverlay">
         <div class="modal">
             <div class="modal-header">
-                <h2>Configuration Cloze</h2>
+                <h2 id="clozeModalTitle">Configuration Cloze</h2>
                 <button class="close-modal" onclick="closeClozeModal()">&times;</button>
             </div>
 
@@ -482,7 +534,38 @@
 
             <div style="margin-top: 2rem; display: flex; gap: 1rem;">
                 <button class="btn btn-secondary" style="flex: 1;" onclick="closeClozeModal()">Annuler</button>
-                <button class="btn" style="flex: 2;" onclick="insertCloze()">Générer et Insérer</button>
+                <button class="btn" id="clozeSubmitBtn" style="flex: 2;" onclick="insertCloze()">Générer et Insérer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table Config Modal -->
+    <div class="modal-overlay" id="tableModalOverlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Insérer un Tableau</h2>
+                <button class="close-modal" onclick="closeTableModal()">&times;</button>
+            </div>
+
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>Lignes</label>
+                    <input type="number" id="tableRows" value="3" min="1">
+                </div>
+                <div class="form-group">
+                    <label>Colonnes</label>
+                    <input type="number" id="tableCols" value="3" min="1">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Épaisseur de la bordure (px)</label>
+                <input type="number" id="tableBorder" value="1" min="0">
+            </div>
+
+            <div style="margin-top: 2rem; display: flex; gap: 1rem;">
+                <button class="btn btn-secondary" style="flex: 1;" onclick="closeTableModal()">Annuler</button>
+                <button class="btn" style="flex: 2;" onclick="insertTable()">Insérer le Tableau</button>
             </div>
         </div>
     </div>
@@ -508,10 +591,31 @@
 
     <div id="toast">Code copié !</div>
 
-    <!-- Quill.js JS -->
     <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 
     <script>
+        // Register Table Blot
+        const BlockEmbed = Quill.import('blots/block/embed');
+        class TableBlot extends BlockEmbed {
+            static create(value) {
+                let node = super.create();
+                node.innerHTML = value.html;
+                if (value.style) {
+                    node.setAttribute('style', value.style);
+                }
+                return node;
+            }
+            static value(node) {
+                return {
+                    html: node.innerHTML,
+                    style: node.getAttribute('style')
+                };
+            }
+        }
+        TableBlot.blotName = 'tableBlot';
+        TableBlot.tagName = 'table';
+        Quill.register(TableBlot);
+
         // Initialize Quill
         const editor = new Quill('#mainEditor', {
             theme: 'snow',
@@ -585,11 +689,123 @@
             });
         }
 
+        let currentEditRange = null;
+
+        function detectClozeAtCursor() {
+            const range = editor.getSelection();
+            if (!range) return null;
+
+            const text = editor.getText();
+            
+            if (range.length > 0) {
+                const selectedText = text.substring(range.index, range.index + range.length).trim();
+                if (selectedText.startsWith('{') && selectedText.endsWith('}')) {
+                    return { index: range.index, length: range.length, code: selectedText };
+                }
+            }
+
+            let start = range.index;
+            let end = range.index;
+
+            while (start > 0 && text[start - 1] !== '{' && text[start - 1] !== '\n') {
+                start--;
+            }
+            if (start > 0 && text[start - 1] === '{') {
+                start--;
+                while (end < text.length && text[end] !== '}' && text[end] !== '\n') {
+                    end++;
+                }
+                if (end < text.length && text[end] === '}') {
+                    end++;
+                    const code = text.substring(start, end);
+                    return { index: start, length: end - start, code: code };
+                }
+            }
+            return null;
+        }
+
+        function parseClozeCode(code) {
+            const match = code.match(/^\{(\d*):([A-Z_]+):(.*)\}$/);
+            if (!match) return null;
+
+            const weight = match[1] || "1";
+            const type = match[2];
+            const answersText = match[3];
+
+            const answersParts = answersText.split('~');
+            const answers = answersParts.map(part => {
+                let grade = 0;
+                let text = part;
+                let feedback = "";
+                let tolerance = "";
+
+                if (text.startsWith('=')) {
+                    grade = 100;
+                    text = text.substring(1);
+                } else if (text.startsWith('%')) {
+                    const gradeMatch = text.match(/^%(\d+)%/);
+                    if (gradeMatch) {
+                        grade = parseInt(gradeMatch[1]);
+                        text = text.substring(gradeMatch[0].length);
+                    }
+                }
+
+                const feedbackIndex = text.indexOf('#');
+                if (feedbackIndex !== -1) {
+                    feedback = text.substring(feedbackIndex + 1);
+                    text = text.substring(0, feedbackIndex);
+                }
+
+                if (type === 'NUMERICAL') {
+                    const tolIndex = text.indexOf(':');
+                    if (tolIndex !== -1) {
+                        tolerance = text.substring(tolIndex + 1);
+                        text = text.substring(0, tolIndex);
+                    }
+                }
+
+                return { text, grade, feedback, tolerance };
+            });
+
+            return { weight, type, answers };
+        }
+
         function openClozeModal() {
+            const detected = detectClozeAtCursor();
+            
             modal.style.display = 'flex';
             answerList.innerHTML = '';
             answerCount = 0;
-            addAnswerRow(); // Start with one correct answer
+
+            const modalTitle = document.getElementById('clozeModalTitle');
+            const submitBtn = document.getElementById('clozeSubmitBtn');
+
+            if (detected) {
+                const parsed = parseClozeCode(detected.code);
+                if (parsed) {
+                    currentEditRange = { index: detected.index, length: detected.length };
+                    modalTitle.innerText = "Modifier la question Cloze";
+                    submitBtn.innerText = "Enregistrer les modifications";
+
+                    document.getElementById('clozeWeight').value = parsed.weight;
+                    document.getElementById('clozeType').value = parsed.type;
+                    
+                    parsed.answers.forEach(ans => {
+                        addAnswerRow(ans.text, ans.grade, ans.feedback, ans.tolerance);
+                    });
+                    toggleNumericalOptions();
+                    return;
+                }
+            }
+
+            // Default Mode: Insert
+            currentEditRange = null;
+            modalTitle.innerText = "Configuration Cloze";
+            submitBtn.innerText = "Générer et Insérer";
+            document.getElementById('clozeWeight').value = "1";
+            document.getElementById('clozeType').value = "MULTICHOICE";
+            addAnswerRow(); // Start with one empty answer
+            toggleNumericalOptions();
         }
 
         function closeClozeModal() {
@@ -610,22 +826,18 @@
 
                 let part = '';
 
-                // Grade prefix
                 if (grade === 100) {
                     part += '=';
                 } else if (grade > 0) {
                     part += `%${grade}%`;
                 }
 
-                // Answer Text
                 part += text;
 
-                // Tolerance for Numerical
                 if (type === 'NUMERICAL' && tolerance) {
                     part += `:${tolerance}`;
                 }
 
-                // Feedback
                 if (feedback) {
                     part += `#${feedback}`;
                 }
@@ -638,13 +850,18 @@
 
         function insertCloze() {
             const code = generateClozeCode();
-            const range = editor.getSelection(true);
 
-            // Insert the code.
-            editor.insertText(range.index, code, 'user');
-
-            // Remove any formatting applied automatically at that position to keep Cloze code clean
-            editor.removeFormat(range.index, code.length);
+            if (currentEditRange) {
+                // Edit mode: replace existing code
+                editor.deleteText(currentEditRange.index, currentEditRange.length, 'user');
+                editor.insertText(currentEditRange.index, code, 'user');
+                editor.removeFormat(currentEditRange.index, code.length);
+            } else {
+                // Insert mode: insert at cursor
+                const range = editor.getSelection(true);
+                editor.insertText(range.index, code, 'user');
+                editor.removeFormat(range.index, code.length);
+            }
 
             updatePreview();
             closeClozeModal();
@@ -740,15 +957,263 @@
             }
         }
 
+        const tableModal = document.getElementById('tableModalOverlay');
+
+        function openTableModal() {
+            tableModal.style.display = 'flex';
+        }
+
+        function closeTableModal() {
+            tableModal.style.display = 'none';
+        }
+
+        function insertTable() {
+            const rows = parseInt(document.getElementById('tableRows').value) || 3;
+            const cols = parseInt(document.getElementById('tableCols').value) || 3;
+            const border = parseInt(document.getElementById('tableBorder').value);
+            
+            const borderStyle = border > 0 ? `${border}px solid #ffffff` : 'none';
+            
+            let tbodyHTML = '<tbody>';
+            for (let r = 0; r < rows; r++) {
+                tbodyHTML += '<tr>';
+                for (let c = 0; c < cols; c++) {
+                    tbodyHTML += `<td style="border: ${borderStyle}; padding: 8px; text-align: left;">&nbsp;</td>`;
+                }
+                tbodyHTML += '</tr>';
+            }
+            tbodyHTML += '</tbody>';
+
+            const range = editor.getSelection(true);
+            editor.insertEmbed(range.index, 'tableBlot', {
+                html: tbodyHTML,
+                style: `width: 100%; border-collapse: collapse; border: ${borderStyle}; margin: 10px 0;`
+            }, 'user');
+            
+            // Insert a newline after the table to make typing below easier
+            editor.insertText(range.index + 1, '\n', 'user');
+            
+            updatePreview();
+            closeTableModal();
+        }
+
         // Click outside modal
         window.onclick = function (event) {
             if (event.target == modal) {
                 closeClozeModal();
             }
+            if (event.target == tableModal) {
+                closeTableModal();
+            }
             if (event.target == document.getElementById('tutorialOverlay')) {
                 closeTutorial();
             }
         }
+
+    </script>
+
+    <!-- OGL Library (UMD version for file:// compatibility) -->
+    <script src="https://cdn.jsdelivr.net/npm/ogl@0.0.32/dist/ogl.umd.js"></script>
+
+    <!-- OGL Animation Script (Inspired by Quentin Hocde) -->
+    <script>
+        const { Renderer, Geometry, Program, Mesh, Vec2, RenderTarget } = ogl;
+
+        const flowmapVertex = `
+            attribute vec2 uv;
+            attribute vec2 position;
+            varying vec2 vUv;
+            void main() {
+                vUv = uv;
+                gl_Position = vec4(position, 0, 1);
+            }
+        `;
+
+        const flowmapFragment = `
+            precision highp float;
+            uniform sampler2D tMap;
+            uniform float uFalloff;
+            uniform float uAlpha;
+            uniform float uDissipation;
+            uniform float uAspect;
+            uniform vec2 uMouse;
+            uniform vec2 uVelocity;
+            varying vec2 vUv;
+            void main() {
+                vec4 color = texture2D(tMap, vUv) * uDissipation;
+                vec2 cursor = vUv - uMouse;
+                cursor.x *= uAspect;
+                vec3 stamp = vec3(uVelocity * vec2(1, -1), 1.0 - pow(1.0 - min(1.0, length(uVelocity)), 3.0));
+                float falloff = smoothstep(uFalloff, 0.0, length(cursor)) * uAlpha;
+                color.rgb = mix(color.rgb, stamp, vec3(falloff));
+                gl_FragColor = color;
+            }
+        `;
+
+        const baseVertex = `
+            attribute vec2 uv;
+            attribute vec2 position;
+            varying vec2 vUv;
+            void main() {
+                vUv = uv;
+                gl_Position = vec4(position, 0, 1);
+            }
+        `;
+
+        const baseFragment = `
+            precision highp float;
+            uniform float uTime;
+            uniform float uEffectiveTime;
+            uniform float uBlurMix;
+            uniform vec2 uResolution;
+            uniform sampler2D tFlow;
+            uniform float uRevert;
+            uniform float uIntensity;
+            varying vec2 vUv;
+
+            vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+            vec2 mod289(vec2 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+            vec3 permute(vec3 x) { return mod289(((x*34.0)+1.0)*x); }
+
+            float snoise(vec2 v) {
+                const vec4 C = vec4(0.211324865405187, 0.366025403784439, -0.577350269189626, 0.024390243902439);
+                vec2 i  = floor(v + dot(v, C.yy));
+                vec2 x0 = v - i + dot(i, C.xx);
+                vec2 i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
+                vec4 x12 = x0.xyxy + C.xxzz;
+                x12.xy -= i1;
+                i = mod289(i);
+                vec3 p = permute(permute(i.y + vec3(0.0, i1.y, 1.0)) + i.x + vec3(0.0, i1.x, 1.0));
+                vec3 m = max(0.5 - vec3(dot(x0,x0), dot(x12.xy,x12.xy), dot(x12.zw,x12.zw)), 0.0);
+                m = m*m; m = m*m;
+                vec3 x = 2.0 * fract(p * C.www) - 1.0;
+                vec3 h = abs(x) - 0.5;
+                vec3 ox = floor(x + 0.5);
+                vec3 a0 = x - ox;
+                m *= 1.79284291400159 - 0.85373472095314 * (a0*a0 + h*h);
+                vec3 g;
+                g.x  = a0.x  * x0.x  + h.x  * x0.y;
+                g.yz = a0.yz * x12.xz + h.yz * x12.yw;
+                return 130.0 * dot(m, g);
+            }
+
+            float grain(vec2 uv, float time) {
+                vec2 seed = uv * uResolution + time;
+                return fract(sin(dot(seed, vec2(12.9898, 78.233))) * 43758.5453);
+            }
+
+            void main() {
+                vec2 uv = vUv;
+                float t = uEffectiveTime;
+                vec4 flow = texture2D(tFlow, uv);
+                vec2 flowVector = (flow.rg * 2.0 - 1.0) * 0.5;
+                vec2 offset = vec2(snoise(uv * 1.0 + t * 0.05), snoise(uv * 1.0 - t * 0.03 + 100.0)) * 0.4;
+                vec2 offset2 = vec2(snoise(uv * 0.6 + t * 0.08), snoise(uv * 0.6 - t * 0.10 + 50.0)) * 0.25;
+                vec2 distortedUv = uv + flowVector + offset + offset2;
+                float shape1 = snoise(distortedUv * 1.2 + t * 0.12);
+                float shape2 = snoise(distortedUv * 0.7 - t * 0.10 + vec2(50.0, 30.0));
+                float shape3 = snoise((distortedUv + offset * 0.3) * 1.8 + t * 0.08);
+                float wave = snoise(uv * 0.5 + t * 0.06) * 0.3;
+                float combined = shape1 * 0.4 + shape2 * 0.35 + shape3 * 0.25 + wave;
+                float depth = snoise(distortedUv * 0.4 - t * 0.05);
+                combined = (combined + depth * 0.4) * 0.5 + 0.5;
+                combined = smoothstep(0.3, 0.7, combined);
+                float blur = (snoise(distortedUv * 0.8 + t * 0.07) * 0.4 + snoise(distortedUv * 0.5 - t * 0.06) * 0.6) * 0.5 + 0.5;
+                float final = mix(combined, blur, uBlurMix);
+                final = smoothstep(0.2, 0.8, final);
+                
+                // Adaptive colors: dark theme with a hint of tech-blue/violet
+                vec3 color = mix(vec3(0.04, 0.04, 0.08), vec3(0.15, 0.1, 0.3), final);
+                
+                float vignette = 1.0 - smoothstep(0.3, 1.1, length(uv - 0.5));
+                color *= mix(0.7, 1.0, vignette);
+                color += (grain(uv, uEffectiveTime * 50.0) - 0.5) * 0.05;
+                gl_FragColor = vec4(color, 1.0);
+            }
+        `;
+
+        class Flowmap {
+            constructor(gl, { size = 128, falloff = 0.3, alpha = 1, dissipation = 0.98 } = {}) {
+                this.gl = gl;
+                this.uniform = { value: null };
+                this.mouse = new Vec2();
+                this.velocity = new Vec2();
+                const type = gl.HALF_FLOAT || gl.renderer.extensions['OES_texture_half_float']?.HALF_FLOAT_OES || gl.UNSIGNED_BYTE;
+                const minFilter = gl.renderer.isWebgl2 || gl.renderer.extensions['OES_texture_half_float_linear'] ? gl.LINEAR : gl.NEAREST;
+                const options = { width: size, height: size, type, format: gl.RGBA, internalFormat: gl.renderer.isWebgl2 ? (type === gl.FLOAT ? gl.RGBA32F : gl.RGBA16F) : gl.RGBA, minFilter, depth: false };
+                this.read = new RenderTarget(gl, options);
+                this.write = new RenderTarget(gl, options);
+                this.mask = {
+                    read: this.read, write: this.write, swap: () => {
+                        let tmp = this.mask.read; this.mask.read = this.mask.write; this.mask.write = tmp;
+                        this.uniform.value = this.mask.read.texture;
+                    }
+                };
+                this.mask.swap();
+                this.geometry = new Geometry(gl, { position: { size: 2, data: new Float32Array([-1, -1, 3, -1, -1, 3]) }, uv: { size: 2, data: new Float32Array([0, 0, 2, 0, 0, 2]) } });
+                this.program = new Program(gl, { vertex: flowmapVertex, fragment: flowmapFragment, uniforms: { tMap: this.uniform, uFalloff: { value: falloff * 0.5 }, uAlpha: { value: alpha }, uDissipation: { value: dissipation }, uAspect: { value: 1 }, uMouse: { value: this.mouse }, uVelocity: { value: this.velocity } }, depthTest: false });
+                this.mesh = new Mesh(gl, { geometry: this.geometry, program: this.program });
+            }
+            update() {
+                this.gl.renderer.render({ scene: this.mesh, target: this.mask.write, clear: false });
+                this.mask.swap();
+            }
+        }
+
+        const container = document.getElementById('background-container');
+        const renderer = new Renderer({ alpha: true, premultipliedAlpha: false });
+        const gl = renderer.gl;
+        container.appendChild(gl.canvas);
+
+        const flowmap = new Flowmap(gl, { falloff: 0.5, alpha: 0.2, dissipation: 0.99 });
+        const geometry = new Geometry(gl, { position: { size: 2, data: new Float32Array([-1, -1, 3, -1, -1, 3]) }, uv: { size: 2, data: new Float32Array([0, 0, 2, 0, 0, 2]) } });
+        const mouse = new Vec2(-1, -1);
+        const velocity = new Vec2(0, 0);
+        const lastMouse = new Vec2(0, 0);
+
+        const program = new Program(gl, {
+            vertex: baseVertex,
+            fragment: baseFragment,
+            uniforms: {
+                uTime: { value: 0 },
+                uEffectiveTime: { value: 0 },
+                uIntensity: { value: 1 },
+                uBlurMix: { value: 0.1 },
+                uResolution: { value: new Vec2(window.innerWidth, window.innerHeight) },
+                tFlow: flowmap.uniform,
+                uMouse: { value: mouse },
+                uRevert: { value: 0 }
+            }
+        });
+
+        const mesh = new Mesh(gl, { geometry, program });
+        let effectiveTime = 0;
+
+        function resize() {
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            program.uniforms.uResolution.value.set(window.innerWidth, window.innerHeight);
+            flowmap.program.uniforms.uAspect.value = window.innerWidth / window.innerHeight;
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        window.addEventListener('mousemove', e => {
+            mouse.set(e.clientX / window.innerWidth, 1 - e.clientY / window.innerHeight);
+            velocity.set(mouse.x - lastMouse.x, mouse.y - lastMouse.y);
+            lastMouse.set(mouse);
+            flowmap.mouse.copy(mouse);
+            flowmap.velocity.lerp(velocity, 0.1);
+        });
+
+        function update(t) {
+            requestAnimationFrame(update);
+            effectiveTime += 0.01 * program.uniforms.uIntensity.value;
+            program.uniforms.uTime.value = t * 0.001;
+            program.uniforms.uEffectiveTime.value = effectiveTime;
+            flowmap.update();
+            renderer.render({ scene: mesh });
+        }
+        requestAnimationFrame(update);
     </script>
 </body>
 
